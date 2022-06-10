@@ -1,499 +1,620 @@
-import React, {useState, useEffect} from 'react'
-import { Wizard } from "react-wizardry";
-import axios from 'axios'; 
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "react-wizardry/dist/react-wizardry.css";
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
-import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import Box from "@mui/material/Box";
+import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import Details from "./Details";
+import SchedDetails from "./SchedDetails";
+import GetDetails from "./GetDetails";
+
+const columns = [
+  {
+    id: "meetingId",
+    label: "Meeting ID",
+  },
+  {
+    id: "topic",
+    label: "Topic",
+  },
+  {
+    id: "createdAt",
+    label: "Created At",
+    minWidth: 100,
+  },
+  {
+    id: "startTime",
+    label: "Start Time",
+  },
+  {
+    id: "duration",
+    label: "Duration (in mins)",
+    align: "right",
+  },
+  {
+    id: "joinUrl",
+    label: "Join URL",
+    align: "right",
+  },
+];
+
+function createData(meetingId, topic, createdAt, startTime, duration, joinUrl) {
+  return { meetingId, topic, createdAt, startTime, duration, joinUrl };
+}
+
+var rows = [];
 
 const initialFormValues = {
-  topic: 'New Meeting',
+  topic: "New Meeting",
   when: new Date(),
-  duration_hrs: '0',
-  duration_mins: '15',
-  host: 'Off',
-  participant: 'Off',
-}
+  duration_hrs: "0",
+  duration_mins: "15",
+  host: "Off",
+  participant: "Off",
+};
+
+const newMeetDetails = {
+  topic: "",
+  created_at: "2022-06-10T03:28:55Z",
+  join_url: "",
+  start_url: "",
+  password: "",
+};
+
+const scheduledMeetDeets = {
+  meeting_id: "",
+  topic: "",
+  created_at: "2022-06-10T03:28:55Z",
+  duration: "",
+  join_url: "",
+  start_url: "",
+  password: "",
+  start_time: "",
+};
+
+const meetingDetails = {
+  meeting_id: "",
+  topic: "",
+  created_at: "2022-06-10T03:28:55Z",
+  duration: "",
+  join_url: "",
+  start_url: "",
+  password: "",
+};
 
 const hours = [
   {
-    value: '0',
-    label: '0',
+    value: "0",
+    label: "0",
   },
   {
-    value: '1',
-    label: '1',
+    value: "1",
+    label: "1",
   },
   {
-    value: '2',
-    label: '2',
+    value: "2",
+    label: "2",
   },
   {
-    value: '3',
-    label: '3',
+    value: "3",
+    label: "3",
   },
   {
-    value: '4',
-    label: '4',
+    value: "4",
+    label: "4",
   },
 ];
 
 const mins = [
   {
-    value: '15',
-    label: '15',
+    value: "15",
+    label: "15",
   },
   {
-    value: '30',
-    label: '30',
+    value: "30",
+    label: "30",
   },
   {
-    value: '45',
-    label: '45',
-  },
-];
-
-const hostVideo =  [
-  {
-    value: 'on',
-    label: 'On',
-  },
-  {
-    value: 'off',
-    label: 'Off',
+    value: "45",
+    label: "45",
   },
 ];
 
-const participantVideo =  [
+const hostVideo = [
   {
-    value: 'on',
-    label: 'On',
+    value: "on",
+    label: "On",
   },
   {
-    value: 'off',
-    label: 'Off',
+    value: "off",
+    label: "Off",
+  },
+];
+
+const participantVideo = [
+  {
+    value: "on",
+    label: "On",
+  },
+  {
+    value: "off",
+    label: "Off",
   },
 ];
 
 export default function Dashboard() {
+  const [when, setWhen] = React.useState(new Date("2022-08-18T21:11:54"));
+  const [newMeetingDetails, setNewMeetingDetails] = useState(newMeetDetails);
+  const [scheduledMeetingDetails, setScheduledMeetingDetails] = useState(
+    scheduledMeetDeets
+  );
+  const [getMeetDetails, SetGetMeetDetails] = useState(meetingDetails);
+  const [isCreated, setIsCreated] = useState(false);
+  const [gotDetails, SetGotDetails] = useState(false);
+  const [isScheduled, setIsScheduled] = useState(false);
+  const [topicName, setTopicName] = useState("");
+  const [schedMeetDetails, setSchedMeetDetails] = useState(initialFormValues);
+  const [hrs, setHrs] = useState("0");
+  const [minutes, setMinutes] = useState("15");
+  const [hostVid, setHostVid] = useState("off");
+  const [participantVid, setParticipantVid] = useState("off");
+  const [meetingID, setMeetingID] = useState("");
+  const [list, setList] = useState([]);
+  const [isListed, setIsListed] = useState(false);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-    const [meetingDetails, setMeetingDetails] = useState([]) 
-    const [isSubmitted, setIsSubmitted] = useState(false)
-    const [isTrue, setIsTrue] = useState(false)
-    const [topicName, setTopicName] = useState("");
-    const [schedMeetDetails, setSchedMeetDetails] = useState(initialFormValues);
-    const [hrs, setHrs] = useState('0');
-    const [minutes, setMinutes] = useState('15');
-    const [hostVid, setHostVid] = useState('off');
-    const [participantVid, setParticipantVid] = useState('off');
-    const [meetingID, setMeetingID] = useState("")
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-    function createMeet(){
-      console.log("This works");
-      axios.get(`http://localhost:3001/newmeeting`)
-      .then(res => {
-        console.log(res.data);
-      })
-    }
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
 
-    function handleTopic(event){
-      setTopicName(event.target.value);
-      console.log(topicName);
-    }
+  function createMeet() {
+    console.log("This works");
+    axios.get(`http://localhost:3001/newmeeting`).then((res) => {
+      console.log(res.data);
+      setNewMeetingDetails({
+        topic: res.data.topic,
+        created_at: res.data.created_at,
+        join_url: res.data.join_url,
+        start_url: res.data.start_url,
+        password: res.data.password,
+      });
+    });
+    setIsCreated(true);
+  }
 
-    function handleHours(event){
-      console.log(event.target.value);
-      setHrs(event.target.value);
-      console.log(hrs)
-    }
+  function handleTopic(event) {
+    setTopicName(event.target.value);
+    console.log(topicName);
+  }
 
-    function handleMins(event){
-      setMinutes(event.target.value);
-      console.log(minutes);
-    }
+  function handleHours(event) {
+    console.log(event.target.value);
+    setHrs(event.target.value);
+    console.log(hrs);
+  }
 
-    function handleHostVid(event){
-      setHostVid(event.target.value);
-      console.log(event.target.value);
-    }
+  function handleMins(event) {
+    setMinutes(event.target.value);
+    console.log(minutes);
+  }
 
-    function handleParticipantVid(event){
-      setParticipantVid(event.target.value)
-      console.log(event.target.value);
-    }
+  const handleWhen = (newValue) => {
+    setWhen(newValue);
+    console.log(when);
+  };
 
-    function handleGetMeetingDetails(event){
-      setMeetingID(event.target.value)
-      console.log(event.target.value);
-    }
+  function handleHostVid(event) {
+    setHostVid(event.target.value);
+    console.log(event.target.value);
+  }
 
-    function handleGetMeetingBtn(){
-      console.log("Get Meeting Detail Button was clicked!")
-      axios.post("http://localhost:3001/getrecording", {meetingID : 12345678}).
-      then((res) => {
-        console.log(res.data)
-      }).catch((error) => {
-        console.log(error)
-      })
-    }
+  function handleParticipantVid(event) {
+    setParticipantVid(event.target.value);
+    console.log(event.target.value);
+  }
 
-    function submitSchedDetails() {
-      initialFormValues.topic = topicName;
-      initialFormValues.when = new Date(2022, 11, 24, 10, 33, 30, 0);
-      initialFormValues.duration_hrs = hrs;
-      initialFormValues.duration_mins = minutes;
-      initialFormValues.host = hostVid;
-      initialFormValues.participant = participantVid;
+  function handleGetMeetingDetails(event) {
+    setMeetingID(event.target.value);
+    console.log(event.target.value);
+  }
 
-      console.log(initialFormValues);
-
-      axios.post("http://localhost:3001/schedulemeeting", initialFormValues)
+  function handleGetMeetingBtn() {
+    console.log("Get Meeting Detail Button was clicked!");
+    axios
+      .post("http://localhost:3001/getdetails", { meetingID: meetingID })
       .then((res) => {
-        console.log(res.data)
-      }).catch((error) => {
-        console.log(error)
+        console.log(res.data);
+        SetGetMeetDetails({
+          meeting_id: res.data.id,
+          topic: res.data.topic,
+          created_at: res.data.created_at,
+          join_url: res.data.join_url,
+          start_url: res.data.start_url,
+          password: res.data.password,
+          duration: res.data.duration + "mins",
+        });
       })
-    }
+      .catch((error) => {
+        console.log(error);
+      });
+    SetGotDetails(true);
+  }
 
-    function handleListMeetings(){
-      console.log("List Meeting Button has been clicked!")
-      axios.post("http://localhost:3001/listmeetings").
-      then((res) => {
-        console.log(res.data)
-      }).catch((error) => {
-        console.log(error)
+  function submitSchedDetails() {
+    initialFormValues.topic = topicName;
+    initialFormValues.when = when;
+    initialFormValues.duration_hrs = hrs;
+    initialFormValues.duration_mins = minutes;
+    initialFormValues.host = hostVid;
+    initialFormValues.participant = participantVid;
+
+    console.log(initialFormValues);
+
+    axios
+      .post("http://localhost:3001/schedulemeeting", initialFormValues)
+      .then((res) => {
+        console.log(res.data);
+
+        setScheduledMeetingDetails({
+          meeting_id: res.data.id,
+          topic: res.data.topic,
+          created_at: res.data.created_at,
+          join_url: res.data.join_url,
+          start_url: res.data.start_url,
+          password: res.data.password,
+          duration: res.data.duration + "mins",
+          start_time: res.data.start_time,
+        });
       })
-    }
-  
+      .catch((error) => {
+        console.log(error);
+      });
+
+    setIsScheduled(true);
+  }
+
+  function handleListMeetings() {
+    console.log("List Meeting Button has been clicked!");
+    axios
+      .get("http://localhost:3001/listmeetings")
+      .then((res) => {
+        console.log(res.data.meetings);
+        setList(res.data.meetings);
+        rows = list;
+        res.data.meetings.forEach((obj) => {
+          rows.push(
+            createData(
+              obj.id,
+              obj.topic,
+              obj.created_at,
+              obj.start_time,
+              obj.duration,
+              obj.join_url
+            )
+          );
+        });
+        setIsListed(true);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   return (
     <div>
-      <div className='create-meeting'>
-        <Divider><p>Create an Instant Meeting</p></Divider>
+      <div className="create-meeting">
+        <Divider>
+          <p>Create an Instant Meeting</p>
+        </Divider>
         <Box
-        component="form"
-        sx={{
-          '& .MuiTextField-root': { m: 1, width: '25ch' },
-        }}
-        noValidate
-        autoComplete="off"
+          component="form"
+          sx={{
+            "& .MuiTextField-root": { m: 1, width: "25ch" },
+          }}
+          noValidate
+          autoComplete="off"
         >
-          <Button variant="contained" onClick={createMeet}>Create</Button>
+          <Button variant="contained" onClick={createMeet}>
+            Create
+          </Button>
         </Box>
+        {isCreated && (
+          <div className="create-details">
+            <Details
+              createdAt={newMeetingDetails.created_at}
+              joinUrl={newMeetingDetails.join_url}
+              startUrl={newMeetingDetails.start_url}
+              topic={newMeetingDetails.topic}
+              password={newMeetingDetails.password}
+            />
+          </div>
+        )}
       </div>
-      <div className='schedule-meeting'>
-      <Divider><p className='sched-title'> Schedule a Meeting </p></Divider>
-      <form >
-      <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-      }}
-      noValidate
-      autoComplete="off"
-      >
-      <TextField id="outlined-required" label="Topic" variant="outlined" onChange={handleTopic} />
-        </Box>
-        <Box
-        component="form"
-        sx={{
-          '& .MuiTextField-root': { m: 1, width: '25ch' },
-        }}
-        noValidate
-        autoComplete="off"
-      >
-        <TextField
-            select
-            label="Duration (Hours)"
-            value={hrs}
-            onChange={handleHours}
-            helperText="Select the Duration in Hours"
+      <div className="schedule-meeting">
+        <Divider>
+          <p className="sched-title"> Schedule a Meeting </p>
+        </Divider>
+        <form>
+          <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
           >
-            {hours.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            select
-            label="Duration (Mins)"
-            value={minutes}
-            onChange={handleMins}
-            helperText="Select the Duration in Minutes"
+            <TextField
+              id="outlined-required"
+              label="Topic"
+              variant="outlined"
+              onChange={handleTopic}
+            />
+          </Box>
+          <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
           >
-            {mins.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-      </Box>
-   
-      <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-      }}
-      noValidate
-      autoComplete="off"
-      >
-      <TextField
-            select
-            label="Host"
-            value={hostVid}
-            onChange={handleHostVid}
-            helperText="Select Host Video Settings"
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <Stack spacing={3}>
+                <DateTimePicker
+                  label="Pick Date & Time"
+                  value={when}
+                  onChange={handleWhen}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </Stack>
+            </LocalizationProvider>
+          </Box>
+          <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
           >
-            {hostVideo.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            select
-            label="Participant"
-            value={participantVid}
-            onChange={handleParticipantVid}
-            helperText="Select Participant Video Settings"
-          >
-            {participantVideo.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-      </Box>
-      <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-      }}
-      noValidate
-      autoComplete="off"
-      >
-        <Button variant="contained" onClick={submitSchedDetails}>Schedule</Button>
-      </Box>
-      <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-      }}
-      noValidate
-      autoComplete="off"
-      >
-        <Accordion  sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-      }}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography>Accordion 1</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-      </Box>
-      
-      <div className='list-meetings'>
-        <Divider><p>List all Meetings</p></Divider>
-        <Box
-        component="form"
-        sx={{
-          '& .MuiTextField-root': { m: 1, width: '25ch' },
-        }}
-        noValidate
-        autoComplete="off"
-        >
-          <Button variant="contained" onClick={handleListMeetings}>List</Button>
-        </Box>
-      </div>
+            <TextField
+              select
+              label="Duration (Hours)"
+              value={hrs}
+              onChange={handleHours}
+              helperText="Select the Duration in Hours"
+            >
+              {hours.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              label="Duration (Mins)"
+              value={minutes}
+              onChange={handleMins}
+              helperText="Select the Duration in Minutes"
+            >
+              {mins.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
 
-    
-      </form>
-      </div>
-      <div className='get-meeting-details'>
-        <Divider><p>Get Meeting Details</p></Divider>
           <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <TextField
+              select
+              label="Host"
+              value={hostVid}
+              onChange={handleHostVid}
+              helperText="Select Host Video Settings"
+            >
+              {hostVideo.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              label="Participant"
+              value={participantVid}
+              onChange={handleParticipantVid}
+              helperText="Select Participant Video Settings"
+            >
+              {participantVideo.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+          <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <Button variant="contained" onClick={submitSchedDetails}>
+              Schedule
+            </Button>
+
+            {isScheduled && (
+              <div className="sched-details">
+                <SchedDetails
+                  createdAt={scheduledMeetingDetails.created_at}
+                  joinUrl={scheduledMeetingDetails.join_url}
+                  startUrl={scheduledMeetingDetails.start_url}
+                  topic={scheduledMeetingDetails.topic}
+                  password={scheduledMeetingDetails.password}
+                  duration={scheduledMeetingDetails.duration}
+                  meetingId={scheduledMeetingDetails.meeting_id}
+                  startTime={scheduledMeetingDetails.start_time}
+                />
+              </div>
+            )}
+          </Box>
+
+          <div className="list-meetings">
+            <Divider>
+              <p>List all Meetings</p>
+            </Divider>
+            <Box
+              component="form"
+              sx={{
+                "& .MuiTextField-root": { m: 1, width: "25ch" },
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <Button variant="contained" onClick={handleListMeetings}>
+                List
+              </Button>
+              {isListed && (
+                <Paper sx={{ width: "100%", overflow: "hidden" }}>
+                  <TableContainer sx={{ maxHeight: 440 }}>
+                    <Table stickyHeader aria-label="sticky table">
+                      <TableHead>
+                        <TableRow>
+                          {columns.map((column) => (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              style={{ minWidth: column.minWidth }}
+                            >
+                              {column.label}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {rows
+                          .slice(
+                            page * rowsPerPage,
+                            page * rowsPerPage + rowsPerPage
+                          )
+                          .map((row) => {
+                            return (
+                              <TableRow
+                                hover
+                                role="checkbox"
+                                tabIndex={-1}
+                                key={row.code}
+                              >
+                                {columns.map((column) => {
+                                  const value = row[column.id];
+                                  return (
+                                    <TableCell
+                                      key={column.id}
+                                      align={column.align}
+                                    >
+                                      {column.format &&
+                                      typeof value === "number"
+                                        ? column.format(value)
+                                        : value}
+                                    </TableCell>
+                                  );
+                                })}
+                              </TableRow>
+                            );
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <TablePagination
+                    rowsPerPageOptions={[10, 25, 100]}
+                    component="div"
+                    count={rows.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </Paper>
+              )}
+            </Box>
+          </div>
+        </form>
+      </div>
+      <div className="get-meeting-details">
+        <Divider>
+          <p>Get Meeting Details</p>
+        </Divider>
+        <Box
           component="form"
           sx={{
-            '& .MuiTextField-root': { m: 1, width: '25ch' },
+            "& .MuiTextField-root": { m: 1, width: "25ch" },
           }}
           noValidate
           autoComplete="off"
-          >
-            <TextField id="outlined-required" label="Meeting ID" variant="outlined" onChange={handleGetMeetingDetails}/>
-          </Box>
-          <Box
+        >
+          <TextField
+            id="outlined-required"
+            label="Meeting ID"
+            variant="outlined"
+            onChange={handleGetMeetingDetails}
+          />
+        </Box>
+        <Box
           component="form"
           sx={{
-            '& .MuiTextField-root': { m: 1, width: '25ch' },
+            "& .MuiTextField-root": { m: 1, width: "25ch" },
           }}
           noValidate
           autoComplete="off"
-          >
-           <Button variant="contained" onClick={handleGetMeetingBtn}>Get</Button>
-          </Box>
+        >
+          <Button variant="contained" onClick={handleGetMeetingBtn}>
+            Get
+          </Button>
+          {gotDetails && (
+            <GetDetails
+              topic={getMeetDetails.topic}
+              createdAt={getMeetDetails.created_at}
+              joinUrl={getMeetDetails.join_url}
+              startUrl={getMeetDetails.start_url}
+              password={getMeetDetails.password}
+              duration={getMeetDetails.duration}
+              meetingId={getMeetDetails.meeting_id}
+            />
+          )}
+        </Box>
       </div>
-      
     </div>
-  )
+  );
 }
-
-// function onSubmit(val){
-//   setIsSubmitted(true);
-//   console.log(val);
-//   setMeetingDetails(val);
-//   console.log(meetingDetails);
-
-//   axios.post("http://localhost:3001/schedulemeeting", val)
-//   .then((res) => {
-//     console.log(res.data)
-//   }).catch((error) => {
-//     console.log(error)
-//   })
-// }
-
-// function onSubmitListMeeting(){
-//   setIsTrue(true);
-//   console.log("This work")
-// }
-
-// <h2>
-//             Create an Instant Meeting
-//       </h2> 
-//         <form id="main-login" action="http://localhost:3001/newmeeting" method="get">     
-//             <button className="btn-style" type="submit">Create</button>
-//         </form>
-//         <Wizard
-//         onFinish={onSubmit}
-//         strict={false}
-//         pages={[
-//           {
-//             title: "Schedule a Meeting",
-//             fields: [
-//               {
-//                 label: "Topic",
-//                 name: "topic",
-//                 type: "text",
-//                 isRequired: true
-//               },
-//               {
-//                 name: "when",
-//                 type: "datetime",
-//                 label: "When",
-//                 isRequired: true
-//               },
-//               {
-//                 label: "Duration (hr)",
-//                 name: "duration-hr",
-//                 type: "radio",
-//                 isRequired: true,
-
-//                 options: [
-//                   { name: "0", value: "0" },
-//                   { name: "1", value: "1" },
-//                   { name: "2", value: "2" },
-//                   { name: "3", value: "3" },
-//                   { name: "4", value: "4" },
-//                   { name: "5", value: "5" },
-//                   { name: "6", value: "6" },
-//                 ]
-//               },
-//               {
-//                 label: "mins",
-//                 name: "duration-mins",
-//                 type: "radio",
-//                 isRequired: true,
-
-//                 options: [
-//                   { name: "0", value: "0" },
-//                   { name: "15", value: "15" },
-//                   { name: "30", value: "30" },
-//                   { name: "45", value: "45" },
-//                 ]
-//               },
-//               {
-//                 label: "Host",
-//                 name: "host",
-//                 type: "radio",
-
-//                 options: [
-//                   { name: "On", value: "on" },
-//                   { name: "Off", value: "off" },
-//                 ]
-//               },
-//               {
-//                 label: "Participant",
-//                 name: "participant",
-//                 type: "radio",
-
-//                 options: [
-//                   { name: "On", value: "on" },
-//                   { name: "Off", value: "off" },
-//                 ]
-//               },
-//             ]
-//           },
-//         ]}
-//       />
-//       {isSubmitted && (
-//         <div className='sched-details'>
-//         <h2>Sceduled Meeting Details: </h2>
-//         <p> Click <a href="https://us05web.zoom.us/s/81125077952?zak=eyJ0eXAiOiJKV1QiLCJzdiI6IjAwMDAwMSIsInptX3NrbSI6InptX28ybSIsImFsZyI6IkhTMjU2In0.eyJhdWQiOiJjbGllbnRzbSIsInVpZCI6Ikx0WHVibmlwUk11X3dLalpOdnAwNmciLCJpc3MiOiJ3ZWIiLCJzayI6IjAiLCJzdHkiOjEwMCwid2NkIjoidXMwNSIsImNsdCI6MCwibW51bSI6IjgxMTI1MDc3OTUyIiwiZXhwIjoxNjUzNDg4MzI0LCJpYXQiOjE2NTM0ODExMjQsImFpZCI6IkRuM0RHdG5GUzB1LVc4cy10VDRGYlEiLCJjaWQiOiIifQ.aHgVZR1hv3z5y3939aPaAsNB-LYflB3obPgMevL1hZM"> <strong>here</strong></a>  to start the meeting </p>
-      
-//         <p><strong> Join Meeting URL: </strong></p>
-//         <p> <a href="https://us05web.zoom.us/j/81125077952?pwd=Vkl5V0E1RmZ4M21yRzErU2JqVDVSUT09">https://us05web.zoom.us/j/81125077952?pwd=Vkl5V0E1RmZ4M21yRzErU2JqVDVSUT09</a> </p>
-//         <p><strong>Password: </strong> Z3dsJU</p>
-//         </div>
-//       )}
-//       <button className="btn-style" type="submit" onClick={onSubmitListMeeting}>List Meetings</button>
-//       {isTrue && (
-//         <div>
-//         <h3>Meeting ID &ensp; Created At &ensp; Duration</h3>
-//         <br/>
-//         <p> 88573733724 &ensp; 26-05-2022 16:08 &ensp; 15 mins</p>
-//         <p> 87694827992 &ensp; 26-05-2022 15:09 &ensp; 30 mins</p>
-      
-//         </div>
-//       )}
-//      <Wizard
-//         onFinish={onSubmit}
-//         strict={false}
-//         pages={[
-//           {
-//             title: "Get Meeting Details",
-//             fields: [
-//               {
-//                 label: "Meeting ID",
-//                 name: "meetid",
-//                 type: "text",
-//                 isRequired: true
-//               },
-//             ]
-//           },
-//         ]}
-//       />
-//        {isSubmitted && (
-//         <div className='sched-details'>
-//         <h2></h2>
-//         <p> You can download the recorded meeting from <a href="/"> <strong>here</strong></a></p>
-      
-
-//         </div>
-//       )}
