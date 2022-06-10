@@ -19,7 +19,6 @@
     "react-datepicker": "^4.8.0",
     "react-dom": "^18.1.0",
     "react-scripts": "^2.1.3",
-    "react-wizardry": "^0.9.0",
     "styled-components": "^5.3.5",
     "web-vitals": "^2.1.4"
   },
