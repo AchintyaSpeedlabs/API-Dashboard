@@ -187,9 +187,7 @@ export default function Dashboard() {
   };
 
   function createMeet() {
-    console.log("This works");
     axios.get(`http://localhost:3001/newmeeting`).then((res) => {
-      console.log(res.data);
       setNewMeetingDetails({
         topic: res.data.topic,
         created_at: res.data.created_at,
@@ -203,46 +201,36 @@ export default function Dashboard() {
 
   function handleTopic(event) {
     setTopicName(event.target.value);
-    console.log(topicName);
   }
 
   function handleHours(event) {
-    console.log(event.target.value);
     setHrs(event.target.value);
-    console.log(hrs);
   }
 
   function handleMins(event) {
     setMinutes(event.target.value);
-    console.log(minutes);
   }
 
   const handleWhen = (newValue) => {
     setWhen(newValue);
-    console.log(when);
   };
 
   function handleHostVid(event) {
     setHostVid(event.target.value);
-    console.log(event.target.value);
   }
 
   function handleParticipantVid(event) {
     setParticipantVid(event.target.value);
-    console.log(event.target.value);
   }
 
   function handleGetMeetingDetails(event) {
     setMeetingID(event.target.value);
-    console.log(event.target.value);
   }
 
   function handleGetMeetingBtn() {
-    console.log("Get Meeting Detail Button was clicked!");
     axios
       .post("http://localhost:3001/getdetails", { meetingID: meetingID })
       .then((res) => {
-        console.log(res.data);
         SetGetMeetDetails({
           meeting_id: res.data.id,
           topic: res.data.topic,
@@ -267,13 +255,9 @@ export default function Dashboard() {
     initialFormValues.host = hostVid;
     initialFormValues.participant = participantVid;
 
-    console.log(initialFormValues);
-
     axios
       .post("http://localhost:3001/schedulemeeting", initialFormValues)
       .then((res) => {
-        console.log(res.data);
-
         setScheduledMeetingDetails({
           meeting_id: res.data.id,
           topic: res.data.topic,
@@ -293,11 +277,9 @@ export default function Dashboard() {
   }
 
   function handleListMeetings() {
-    console.log("List Meeting Button has been clicked!");
     axios
       .get("http://localhost:3001/listmeetings")
       .then((res) => {
-        console.log(res.data.meetings);
         setList(res.data.meetings);
         rows = list;
         res.data.meetings.forEach((obj) => {
