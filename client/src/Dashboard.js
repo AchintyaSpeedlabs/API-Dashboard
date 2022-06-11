@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
@@ -20,140 +20,23 @@ import TableRow from "@mui/material/TableRow";
 import Details from "./Details";
 import SchedDetails from "./SchedDetails";
 import GetDetails from "./GetDetails";
-
-const columns = [
-  {
-    id: "meetingId",
-    label: "Meeting ID",
-  },
-  {
-    id: "topic",
-    label: "Topic",
-  },
-  {
-    id: "createdAt",
-    label: "Created At",
-    minWidth: 100,
-  },
-  {
-    id: "startTime",
-    label: "Start Time",
-  },
-  {
-    id: "duration",
-    label: "Duration (in mins)",
-    align: "right",
-  },
-  {
-    id: "joinUrl",
-    label: "Join URL",
-    align: "right",
-  },
-];
+import {
+  columns,
+  initialFormValues,
+  newMeetDetails,
+  scheduledMeetDeets,
+  meetingDetails,
+  hours,
+  mins,
+  hostVideo,
+  participantVideo,
+} from "./Data";
 
 function createData(meetingId, topic, createdAt, startTime, duration, joinUrl) {
   return { meetingId, topic, createdAt, startTime, duration, joinUrl };
 }
 
 var rows = [];
-
-const initialFormValues = {
-  topic: "New Meeting",
-  when: new Date(),
-  duration_hrs: "0",
-  duration_mins: "15",
-  host: "Off",
-  participant: "Off",
-};
-
-const newMeetDetails = {
-  topic: "",
-  created_at: "2022-06-10T03:28:55Z",
-  join_url: "",
-  start_url: "",
-  password: "",
-};
-
-const scheduledMeetDeets = {
-  meeting_id: "",
-  topic: "",
-  created_at: "2022-06-10T03:28:55Z",
-  duration: "",
-  join_url: "",
-  start_url: "",
-  password: "",
-  start_time: "",
-};
-
-const meetingDetails = {
-  meeting_id: "",
-  topic: "",
-  created_at: "2022-06-10T03:28:55Z",
-  duration: "",
-  join_url: "",
-  start_url: "",
-  password: "",
-};
-
-const hours = [
-  {
-    value: "0",
-    label: "0",
-  },
-  {
-    value: "1",
-    label: "1",
-  },
-  {
-    value: "2",
-    label: "2",
-  },
-  {
-    value: "3",
-    label: "3",
-  },
-  {
-    value: "4",
-    label: "4",
-  },
-];
-
-const mins = [
-  {
-    value: "15",
-    label: "15",
-  },
-  {
-    value: "30",
-    label: "30",
-  },
-  {
-    value: "45",
-    label: "45",
-  },
-];
-
-const hostVideo = [
-  {
-    value: "on",
-    label: "On",
-  },
-  {
-    value: "off",
-    label: "Off",
-  },
-];
-
-const participantVideo = [
-  {
-    value: "on",
-    label: "On",
-  },
-  {
-    value: "off",
-    label: "Off",
-  },
-];
 
 export default function Dashboard() {
   const [when, setWhen] = React.useState(new Date("2022-08-18T21:11:54"));
@@ -166,7 +49,6 @@ export default function Dashboard() {
   const [gotDetails, SetGotDetails] = useState(false);
   const [isScheduled, setIsScheduled] = useState(false);
   const [topicName, setTopicName] = useState("");
-  const [schedMeetDetails, setSchedMeetDetails] = useState(initialFormValues);
   const [hrs, setHrs] = useState("0");
   const [minutes, setMinutes] = useState("15");
   const [hostVid, setHostVid] = useState("off");
