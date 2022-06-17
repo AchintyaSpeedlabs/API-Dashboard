@@ -11,3 +11,5 @@ client/npm-debug.log*
 # Server Side
 server/.env
 server/node_modules
+
+to-do.md

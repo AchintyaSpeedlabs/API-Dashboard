@@ -32,7 +32,17 @@ import {
   participantVideo,
 } from "./Data";
 
+const GmtToIst = (gmtTime) => {
+  var s = new Date(gmtTime).toLocaleString(undefined, {
+    timeZone: "Asia/Kolkata",
+  });
+  return s;
+};
+
 function createData(meetingId, topic, createdAt, startTime, duration, joinUrl) {
+  startTime = GmtToIst(startTime);
+  createdAt = GmtToIst(createdAt);
+  joinUrl = <a href={joinUrl}>Join</a>;
   return { meetingId, topic, createdAt, startTime, duration, joinUrl };
 }
 
