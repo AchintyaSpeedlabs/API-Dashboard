@@ -121,6 +121,7 @@ export default function Dashboard() {
           start_url: res.data.start_url,
           password: res.data.password,
           duration: res.data.duration + "mins",
+          status: res.data.status,
         });
       })
       .catch((error) => {
@@ -474,6 +475,7 @@ export default function Dashboard() {
               password={getMeetDetails.password}
               duration={getMeetDetails.duration}
               meetingId={getMeetDetails.meeting_id}
+              status={getMeetDetails.status}
             />
           )}
         </Box>

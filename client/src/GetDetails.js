@@ -20,6 +20,7 @@ export default function SchedDetails({
   password,
   duration,
   meetingId,
+  status,
 }) {
   return (
     <div style={{ width: "100%" }}>
@@ -46,7 +47,7 @@ export default function SchedDetails({
           {" "}
           <strong>Created at </strong> {createdAt}
         </p>
-
+        <p> Status : {status}</p>
         <p>
           {" "}
           <strong>Join URL:</strong>{" "}

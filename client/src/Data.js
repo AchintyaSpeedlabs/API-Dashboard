@@ -64,6 +64,7 @@ export const meetingDetails = {
   join_url: "",
   start_url: "",
   password: "",
+  status: "",
 };
 
 export const hours = [
