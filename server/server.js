@@ -114,9 +114,9 @@ app.get("/listmeetings", function (req, res) {
       email +
       "/meetings" +
       "?" +
-      "page_size=60" +
+      "page_size=30" +
       "&" +
-      "type=upcoming",
+      "type=shceduled",
     auth: {
       bearer: token,
     },
