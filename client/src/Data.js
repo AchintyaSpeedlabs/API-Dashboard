@@ -2,29 +2,32 @@ export const columns = [
   {
     id: "meetingId",
     label: "Meeting ID",
+    align: "left",
   },
   {
     id: "topic",
     label: "Topic",
+    align: "left",
   },
   {
     id: "createdAt",
     label: "Created At",
-    minWidth: 100,
+    align: "left",
   },
   {
     id: "startTime",
     label: "Start Time",
+    align: "left",
   },
   {
     id: "duration",
-    label: "Duration (in mins)",
-    align: "right",
+    label: "Duration",
+    align: "left",
   },
   {
     id: "joinUrl",
     label: "Join URL",
-    align: "right",
+    align: "left",
   },
 ];
 
