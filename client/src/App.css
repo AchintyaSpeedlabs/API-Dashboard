@@ -1,3 +1,66 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.wizard {
+  width: 50%;
+  background-color: aqua;
+}
+
+/* Style the form - display items horizontally */
+.form-inline {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+Add some margins for each label .form-inline label {
+  margin: 5px 10px 5px 0;
+}
+
+/* Style the input fields */
+.form-inline input {
+  vertical-align: middle;
+  margin: 5px 10px 5px 0;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+/* Style the submit button */
+.form-inline button {
+  padding: 10px 20px;
+  background-color: #fd8a1f;
+  border: 1px solid #ddd;
+  color: white;
+}
+
+.form-inline button:hover {
+  background-color: #fd8a1f;
+}
+
+/* Add responsiveness - display the form controls vertically instead of horizontally on screens that are less than 800px wide */
+@media (max-width: 800px) {
+  .form-inline input {
+    margin: 10px 0;
+  }
+
+  .form-inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 .App {
   text-align: center;
 }
@@ -27,6 +90,30 @@
 .App-link {
   color: #61dafb;
 }
+.btn-style {
+  cursor: pointer;
+  outline: 0;
+  color: #fff;
+  background-color: #fd8a1f;
+  border-color: #fd8a1f;
+  display: inline-block;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  font-size: 16px;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  margin: 15px;
+}
+
+.btn-style:hover {
+  color: #fff;
+  background-color: #fd8a1f;
+  border-color: #fd8a1f;
+}
 
 @keyframes App-logo-spin {
   from {
@@ -37,11 +124,84 @@
   }
 }
 
-.sched-details {
-  margin: 30px;
+.create-meeting p {
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: #6a2f85;
+}
+
+.create-meeting button {
+  width: 100%;
+  height: 3rem;
+  background-color: #ff9433;
+}
+
+.get-meeting-details button {
+  margin-top: 1.5rem;
+  width: 100px;
+  height: 40px;
+  background-color: #ff9433;
+}
+
+.scheduleBtnDiv button {
+  width: 100%;
+  height: 3rem;
+  background-color: #ff9433;
+  margin-top: 1rem;
+}
+
+.schedule-meeting .sched-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.get-meeting-details p {
+  margin: 0;
+  margin-left: 0.2rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.list-meetings p {
+  margin: 1.5rem 0rem 1rem 0.2rem;
+  margin-left: 0.2rem;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
 .createBox p {
   font-size: 1rem;
   line-height: 0.8rem;
+}
+
+.dashboard {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.addIcon {
+  margin: 0.5rem;
+}
+
+/* ------------ Schedule Meeting (Left Half) ------------*/
+.left {
+  flex: 10%;
+  text-align: left;
+  padding: 0.1rem 0.3rem 0.1rem 1.5rem;
+}
+
+/* -------------- Modal Styling ----------------*/
+
+/* ------------ Get Meeting Details (Right Half) ------------*/
+
+.right {
+  flex: 50%;
+  border: 0.01rem solid lightgrey;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+  border-radius: 5px;
+  margin: 4.8rem 1rem 0rem 1rem;
+  text-align: left;
+  padding: 1rem;
 }

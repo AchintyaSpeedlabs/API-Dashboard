@@ -72,6 +72,7 @@ app.post("/schedulemeeting", function (req, res) {
       topic: scheduledMeetDetails.topic,
       type: 2,
       start_time: scheduledMeetDetails.when,
+      // schedule_for: process.env.USER_ID,
       duration: meetMinutes,
       settings: {
         host_video: scheduledMeetDetails.host == "off" ? false : true,
@@ -108,8 +109,14 @@ app.get("/listmeetings", function (req, res) {
 
   var options = {
     method: "GET",
-    uri: "https://api.zoom.us/v2/users/" + email + "/meetings",
-    body: { type: "live" },
+    uri:
+      "https://api.zoom.us/v2/users/" +
+      email +
+      "/meetings" +
+      "?" +
+      "page_size=30" +
+      "&" +
+      "type=shceduled",
     auth: {
       bearer: token,
     },
