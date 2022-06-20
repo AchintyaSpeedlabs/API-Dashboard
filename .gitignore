@@ -13,3 +13,4 @@ server/.env
 server/node_modules
 
 to-do.md
+.prettierignore
