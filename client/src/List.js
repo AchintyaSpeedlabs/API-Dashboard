@@ -37,11 +37,11 @@ export default function List() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openDetails, setOpenDetails] = useState(false);
+  const [recordingExists, setRecordingsExist] = useState(false);
+  const [display, setDisplay] = useState(false);
   const handleCloseDetails = () => setOpenDetails(false);
 
   useEffect(() => {
-    console.log("mounted");
-    console.log("List button was clicked");
     axios
       .get("http://localhost:3001/listmeetings")
       .then((res) => {
@@ -102,14 +102,22 @@ export default function List() {
 
   function handleGetMeetingBtn() {
     axios
-      .post("http://localhost:3001/getdetails", { meetingID: meetingID })
+      .post("http://localhost:3001/getrecording", { meetingID: meetingID })
       .then((res) => {
+        console.log(res.data);
+        if (res.data.statusCode === undefined) {
+          setRecordingsExist(true);
+          setDisplay(true);
+        } else if (Number(res.data.statusCode) === 404) {
+          setRecordingsExist(true);
+          setDisplay(false);
+        }
         SetGetMeetDetails({
           meeting_id: res.data.id,
           topic: res.data.topic,
-          created_at: res.data.created_at,
-          join_url: res.data.join_url,
-          start_url: res.data.start_url,
+          start_time: res.data.created_at,
+          recording_count: res.data.recording_count,
+          recording_files: res.data.recording_files,
           password: res.data.password,
           duration: res.data.duration + " mins",
           status: res.data.status,
@@ -130,7 +138,7 @@ export default function List() {
             "& .MuiTextField-root": { mt: 3, mr: 2.5, width: "40%" },
           }}
         >
-          <p>Get Meeting Details</p>
+          <p>Get Meeting Recordings</p>
           <TextField
             label="Enter Meeting ID"
             variant="outlined"
@@ -148,19 +156,25 @@ export default function List() {
           >
             <Box sx={style}>
               <Typography id="modal-modal-title" variant="h6" component="h2">
-                Meeting Invitation
+                <strong>Meeting Invitation</strong>
               </Typography>
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                <GetDetails
-                  topic={getMeetDetails.topic}
-                  createdAt={getMeetDetails.created_at}
-                  joinUrl={getMeetDetails.join_url}
-                  startUrl={getMeetDetails.start_url}
-                  password={getMeetDetails.password}
-                  duration={getMeetDetails.duration}
-                  meetingId={getMeetDetails.meeting_id}
-                  status={getMeetDetails.status}
-                />
+              <Typography id="modal-modal-description" sx={{ mt: 1 }}>
+                <p></p>
+                {recordingExists ? (
+                  <GetDetails
+                    display={display}
+                    topic={getMeetDetails.topic}
+                    startTime={getMeetDetails.start_time}
+                    recordingCount={getMeetDetails.recording_count}
+                    recordingFiles={getMeetDetails.recording_files}
+                    password={getMeetDetails.password}
+                    duration={getMeetDetails.duration}
+                    meetingId={getMeetDetails.meeting_id}
+                    status={getMeetDetails.status}
+                  />
+                ) : (
+                  <p>Getting the Meeting Details...</p>
+                )}
               </Typography>
             </Box>
           </Modal>

@@ -62,10 +62,10 @@ export const scheduledMeetDeets = {
 export const meetingDetails = {
   meeting_id: "",
   topic: "",
-  created_at: "2022-06-10T03:28:55Z",
+  start_time: "2022-06-10T03:28:55Z",
   duration: "",
-  join_url: "",
-  start_url: "",
+  recording_count: 0,
+  recording_files: [],
   password: "",
   status: "",
 };
