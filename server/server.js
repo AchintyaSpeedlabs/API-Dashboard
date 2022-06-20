@@ -173,11 +173,11 @@ app.post("/getdetails", function (req, res) {
 // Get Cloud Recording of a meeting (Cloud recordings are only supported for Premium Accounts)
 app.post("/getrecording", function (req, res) {
   console.log("You just sent a POST request to this route /getrecording");
-  meetingID = "85928086679";
+  meetingID = req.body.meetingID;
 
   var options = {
     method: "GET",
-    uri: "https://api.zoom.us/v2/meetings/" + meetingID + "recordings",
+    uri: "https://api.zoom.us/v2/meetings/" + meetingID + "/recordings",
     body: {
       meetingId: meetingID,
     },
@@ -194,11 +194,13 @@ app.post("/getrecording", function (req, res) {
   rp(options)
     .then(function (response) {
       console.log("response is: ", response);
+      res.json(response);
       //   res.send("create meeting result: " + JSON.stringify(response));
     })
     .catch(function (err) {
       // API call failed...
       console.log("API call failed, reason ", err);
+      res.json(err);
     });
 });
 
