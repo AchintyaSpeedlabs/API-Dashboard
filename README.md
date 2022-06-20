@@ -47,7 +47,7 @@ To get a local copy up and running follow these simple steps:
 1. Create an Instant Zoom Meeting
 2. Schedule a Zoom Meeting for later
 3. Get a list of all the meetings for an account
-4. Get details of any previous meeting using Meeting ID
+4. Get recordings of any previous meeting using Meeting ID
 
 ### Configuration for Environment Variables
 
