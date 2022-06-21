@@ -1,5 +1,4 @@
 import React from "react";
-import LinkIcon from "@mui/icons-material/Link";
 import "./App.css";
 
 export default function SchedDetails({
