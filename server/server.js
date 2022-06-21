@@ -204,4 +204,34 @@ app.post("/getrecording", function (req, res) {
     });
 });
 
+app.get("/listrecordings", function (req, res) {
+  console.log("You just sent a GET request to this route /listrecordings");
+  var userID = process.env.USER_ID;
+
+  var options = {
+    method: "GET",
+    uri: "https://api.zoom.us/v2/users/" + userID + "/recordings",
+    auth: {
+      bearer: token,
+    },
+    headers: {
+      "User-Agent": "Zoom-api-Jwt-Request",
+      "content-type": "application/json",
+    },
+    json: true, //Parse the JSON string in the response
+  };
+
+  rp(options)
+    .then(function (response) {
+      console.log("response is: ", response);
+      res.json(response);
+      //   res.send("create meeting result: " + JSON.stringify(response));
+    })
+    .catch(function (err) {
+      // API call failed...
+      console.log("API call failed, reason ", err);
+      res.json(err);
+    });
+});
+
 http.listen(port, () => console.log(`Listening on port ${port}`));

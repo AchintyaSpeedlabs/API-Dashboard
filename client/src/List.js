@@ -14,7 +14,7 @@ import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import GetDetails from "./GetDetails";
-import { columns, meetingDetails } from "./Data";
+import { columns, meetingDetails, recordingColumns } from "./Data";
 
 const style = {
   position: "absolute",
@@ -29,17 +29,24 @@ const style = {
 };
 
 var rows = [];
+var recordingRows = [];
 
 export default function List() {
   const [getMeetDetails, SetGetMeetDetails] = useState(meetingDetails);
   const [meetingID, setMeetingID] = useState("");
   const [list, setList] = useState([]);
+  const [recordingsArray, setRecordingsArray] = useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [pageRecording, setPageRecording] = React.useState(0);
+  const [rowsPerPageRecording, setRowsPerPageRecording] = useState(10);
   const [openDetails, setOpenDetails] = useState(false);
+  const [openRecordingList, setOpenRecordingList] = useState(false);
   const [recordingExists, setRecordingsExist] = useState(false);
+  const [gotRecordingList, setGotRecordingList] = useState(false);
   const [display, setDisplay] = useState(false);
   const handleCloseDetails = () => setOpenDetails(false);
+  const handleCloseRecordingList = () => setOpenRecordingList(false);
 
   useEffect(() => {
     axios
@@ -82,9 +89,30 @@ export default function List() {
   ) {
     startTime = GmtToIst(startTime);
     createdAt = GmtToIst(createdAt);
-    joinUrl = <a href={joinUrl}>Join</a>;
+    joinUrl = (
+      <a href={joinUrl} target="_blank" rel="noopener noreferrer">
+        Join
+      </a>
+    );
     duration = duration + "min";
     return { meetingId, topic, createdAt, startTime, duration, joinUrl };
+  }
+
+  function createRecordingData(
+    meetingId,
+    topic,
+    startTime,
+    duration,
+    shareUrl
+  ) {
+    startTime = GmtToIst(startTime);
+    shareUrl = (
+      <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+        Here
+      </a>
+    );
+    duration = duration + "min";
+    return { meetingId, topic, startTime, duration, shareUrl };
   }
 
   const handleChangePage = (event, newPage) => {
@@ -96,8 +124,46 @@ export default function List() {
     setPage(0);
   };
 
+  const handleChangePageRecording = (event, newPage) => {
+    setPageRecording(newPage);
+  };
+
+  const handleChangeRowsPerPageRecording = (event) => {
+    setRowsPerPageRecording(+event.target.value);
+    setPageRecording(0);
+  };
+
   function handleGetMeetingDetails(event) {
     setMeetingID(event.target.value);
+  }
+
+  function handleRecordingList() {
+    axios
+      .get("http://localhost:3001/listrecordings")
+      .then((res) => {
+        console.log(res.data.meetings);
+        setRecordingsArray(res.data.meetings);
+        recordingRows = recordingsArray;
+        console.log(recordingRows);
+        console.log(recordingsArray);
+        res.data.meetings.forEach((obj) => {
+          recordingsArray.push(
+            createRecordingData(
+              obj.id,
+              obj.topic,
+              obj.start_time,
+              obj.duration,
+              obj.share_url
+            )
+          );
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    setOpenRecordingList(true);
+    setGotRecordingList(true);
   }
 
   function handleGetMeetingBtn() {
@@ -148,6 +214,114 @@ export default function List() {
           <Button variant="contained" onClick={handleGetMeetingBtn}>
             Get
           </Button>
+          <div className="recordingListDiv">
+            <Button variant="contained" onClick={handleRecordingList}>
+              List Recordings
+            </Button>
+          </div>
+          <Modal
+            open={openRecordingList}
+            onClose={handleCloseRecordingList}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 1000,
+                bgcolor: "background.paper",
+                borderRadius: "0.4rem",
+                boxShadow: 24,
+                p: 4,
+              }}
+            >
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                <strong>Recordings</strong>
+              </Typography>
+              <Typography id="modal-modal-description">
+                {gotRecordingList ? (
+                  <Box>
+                    <Paper sx={{ width: "100%", overflow: "hidden" }}>
+                      <TableContainer sx={{ maxHeight: 450 }}>
+                        <Table stickyHeader aria-label="sticky table">
+                          <TableHead>
+                            <TableRow
+                              sx={{
+                                "& th": {
+                                  color: "white",
+                                  backgroundColor: "#6A2F85",
+                                },
+                              }}
+                            >
+                              {recordingColumns.map((column) => (
+                                <TableCell
+                                  key={column.id}
+                                  align={column.align}
+                                  style={{ minWidth: column.minWidth }}
+                                >
+                                  {column.label}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {recordingRows
+                              .slice(
+                                pageRecording * rowsPerPageRecording,
+                                pageRecording * rowsPerPageRecording +
+                                  rowsPerPageRecording
+                              )
+                              .map((row) => {
+                                return (
+                                  <TableRow
+                                    style={{ height: 10 }}
+                                    hover
+                                    role="checkbox"
+                                    tabIndex={-1}
+                                    key={row.code}
+                                  >
+                                    {columns.map((column) => {
+                                      const value = row[column.id];
+                                      return (
+                                        <TableCell
+                                          style={{ padding: "0.5rem" }}
+                                          key={column.id}
+                                          align={column.align}
+                                        >
+                                          {column.format &&
+                                          typeof value === "number"
+                                            ? column.format(value)
+                                            : value}
+                                        </TableCell>
+                                      );
+                                    })}
+                                  </TableRow>
+                                );
+                              })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                      <TablePagination
+                        rowsPerPageOptions={[]}
+                        component="div"
+                        count={rows.length}
+                        rowsPerPage={rowsPerPageRecording}
+                        page={pageRecording}
+                        onPageChange={handleChangePageRecording}
+                        onRowsPerPageChange={handleChangeRowsPerPageRecording}
+                      />
+                    </Paper>
+                  </Box>
+                ) : (
+                  <p>Getting the List of Recordings...</p>
+                )}
+              </Typography>
+            </Box>
+          </Modal>
+
           <Modal
             open={openDetails}
             onClose={handleCloseDetails}
@@ -222,6 +396,7 @@ export default function List() {
                         >
                           {columns.map((column) => {
                             const value = row[column.id];
+                            console.log(value);
                             return (
                               <TableCell
                                 style={{ padding: "0.5rem" }}

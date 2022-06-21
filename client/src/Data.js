@@ -31,6 +31,34 @@ export const columns = [
   },
 ];
 
+export const recordingColumns = [
+  {
+    id: "meetingId",
+    label: "Meeting ID",
+    align: "left",
+  },
+  {
+    id: "topic",
+    label: "Title",
+    align: "left",
+  },
+  {
+    id: "startTime",
+    label: "Start Time",
+    align: "left",
+  },
+  {
+    id: "duration",
+    label: "Duration",
+    align: "left",
+  },
+  {
+    id: "shareUrl",
+    label: "Share URL",
+    align: "left",
+  },
+];
+
 export const initialFormValues = {
   topic: "New Meeting",
   when: new Date(),

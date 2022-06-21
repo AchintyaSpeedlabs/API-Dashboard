@@ -210,3 +210,12 @@ Add some margins for each label .form-inline label {
   text-align: left;
   padding: 1rem;
 }
+
+.recordingListDiv {
+  display: inline;
+  margin: 1rem;
+}
+
+.recordingListDiv button {
+  width: 20%;
+}
