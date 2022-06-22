@@ -28,6 +28,17 @@ function DateFormat(str) {
   return splitArr[0];
 }
 
+//Function to sort the response based on date
+function compare(a, b) {
+  if (a.start_time < b.start_time) {
+    return 1;
+  }
+  if (a.start_time > b.start_time) {
+    return -1;
+  }
+  return 0;
+}
+
 // Create an instant meeting
 app.get("/newmeeting", (req, res) => {
   email = process.env.USER_ID;
@@ -136,8 +147,12 @@ app.get("/listmeetings", function (req, res) {
 
   rp(options)
     .then(function (response) {
-      console.log("response is: ", response);
-      res.json(response);
+      // console.log("response is: ", response);
+
+      var temp = response.meetings;
+      temp.sort(compare);
+      console.log(temp);
+      res.json(temp);
     })
     .catch(function (err) {
       // API call failed...

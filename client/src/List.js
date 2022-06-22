@@ -65,9 +65,9 @@ export default function List() {
     axios
       .get("http://localhost:3001/listmeetings")
       .then((res) => {
-        setList(res.data.meetings);
+        setList(res.data);
         rows = list;
-        res.data.meetings.forEach((obj) => {
+        res.data.forEach((obj) => {
           rows.push(
             createData(
               obj.id,
