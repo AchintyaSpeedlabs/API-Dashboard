@@ -185,7 +185,9 @@ export default function List() {
 
   function handleGetMeetingBtn() {
     axios
-      .post("http://localhost:3001/getrecording", { meetingID: meetingID })
+      .post("http://localhost:3001/getrecording", {
+        meetingID: meetingID.trim(),
+      })
       .then((res) => {
         console.log(res.data);
         if (res.data.statusCode === undefined) {
