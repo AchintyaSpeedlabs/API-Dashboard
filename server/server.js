@@ -21,6 +21,13 @@ const payload = {
 };
 const token = jwt.sign(payload, process.env.API_SECRET);
 
+// Function to convert the Date-Time Format into Only Date Format
+function DateFormat(str) {
+  const splitArr = str.split("T");
+  console.log(splitArr[0]);
+  return splitArr[0];
+}
+
 // Create an instant meeting
 app.get("/newmeeting", (req, res) => {
   email = process.env.USER_ID;
@@ -114,7 +121,7 @@ app.get("/listmeetings", function (req, res) {
       email +
       "/meetings" +
       "?" +
-      "page_size=30" +
+      "page_size=60" +
       "&" +
       "type=shceduled",
     auth: {
@@ -204,13 +211,28 @@ app.post("/getrecording", function (req, res) {
     });
 });
 
-app.get("/listrecordings", function (req, res) {
-  console.log("You just sent a GET request to this route /listrecordings");
+// List all the Cloud recordings in the selected range (Only for Premium Accounts)
+app.post("/listrecordings", function (req, res) {
+  console.log("You just sent a POST request to this route /listrecordings");
   var userID = process.env.USER_ID;
+
+  from = DateFormat(req.body.range.fromValue);
+  to = DateFormat(req.body.range.toValue);
 
   var options = {
     method: "GET",
-    uri: "https://api.zoom.us/v2/users/" + userID + "/recordings",
+    uri:
+      "https://api.zoom.us/v2/users/" +
+      userID +
+      "/recordings" +
+      "?" +
+      "from=" +
+      from +
+      "&" +
+      "to=" +
+      to +
+      "&" +
+      "page_size=60",
     auth: {
       bearer: token,
     },
