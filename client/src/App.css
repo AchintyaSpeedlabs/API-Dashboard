@@ -136,13 +136,6 @@ Add some margins for each label .form-inline label {
   background-color: #ff9433;
 }
 
-.get-meeting-details button {
-  margin-top: 1.5rem;
-  width: 100px;
-  height: 40px;
-  background-color: #ff9433;
-}
-
 .scheduleBtnDiv button {
   width: 100%;
   height: 3rem;
@@ -181,7 +174,7 @@ Add some margins for each label .form-inline label {
 
 .dashboard {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   width: 100%;
 }
 
@@ -206,7 +199,7 @@ Add some margins for each label .form-inline label {
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
   border-radius: 5px;
   border-radius: 5px;
-  margin: 4.8rem 1rem 0rem 1rem;
+  margin: 2rem 1rem 0rem 1rem;
   text-align: left;
   padding: 1rem;
 }
@@ -218,4 +211,25 @@ Add some margins for each label .form-inline label {
 
 .recordingListDiv button {
   width: 20%;
+  margin-top: 1.2rem;
+  height: 45px;
+  background-color: #ff9433;
+}
+
+/* .get-meeting-details button {
+  margin-top: 1.5rem;
+  width: 100px;
+  height: 40px;
+  background-color: #ff9433;
+} */
+
+.meetingDetailsDiv {
+  display: inline;
+  margin: 1rem;
+}
+
+.meetingDetailsDiv button {
+  width: 10%;
+  margin-top: 1.4rem;
+  background-color: #ff9433;
 }
