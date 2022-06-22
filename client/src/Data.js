@@ -6,7 +6,7 @@ export const columns = [
   },
   {
     id: "topic",
-    label: "Topic",
+    label: "Title",
     align: "left",
   },
   {
@@ -28,6 +28,7 @@ export const columns = [
     id: "joinUrl",
     label: "Join URL",
     align: "left",
+    minWidth: 80,
   },
 ];
 

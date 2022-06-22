@@ -14,6 +14,9 @@ import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import GetDetails from "./GetDetails";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { columns, meetingDetails, recordingColumns } from "./Data";
 
 const style = {
@@ -38,7 +41,7 @@ export default function List() {
   const [recordingsArray, setRecordingsArray] = useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [pageRecording, setPageRecording] = React.useState(0);
+  const [pageRecording, setPageRecording] = useState(0);
   const [rowsPerPageRecording, setRowsPerPageRecording] = useState(10);
   const [openDetails, setOpenDetails] = useState(false);
   const [openRecordingList, setOpenRecordingList] = useState(false);
@@ -47,6 +50,16 @@ export default function List() {
   const [display, setDisplay] = useState(false);
   const handleCloseDetails = () => setOpenDetails(false);
   const handleCloseRecordingList = () => setOpenRecordingList(false);
+  const [fromValue, setFromValue] = useState(new Date("2022-06-20T21:11:54"));
+  const [toValue, setToValue] = useState(new Date("2022-06-21T21:11:54"));
+
+  const handleFromChange = (newValue) => {
+    setFromValue(newValue);
+  };
+
+  const handleToChange = (newValue) => {
+    setToValue(newValue);
+  };
 
   useEffect(() => {
     axios
@@ -91,7 +104,7 @@ export default function List() {
     createdAt = GmtToIst(createdAt);
     joinUrl = (
       <a href={joinUrl} target="_blank" rel="noopener noreferrer">
-        Join
+        Join Now
       </a>
     );
     duration = duration + "min";
@@ -108,7 +121,7 @@ export default function List() {
     startTime = GmtToIst(startTime);
     shareUrl = (
       <a href={shareUrl} target="_blank" rel="noopener noreferrer">
-        Here
+        Link
       </a>
     );
     duration = duration + "min";
@@ -138,8 +151,11 @@ export default function List() {
   }
 
   function handleRecordingList() {
+    var tempArray = [];
     axios
-      .get("http://localhost:3001/listrecordings")
+      .post("http://localhost:3001/listrecordings", {
+        range: { fromValue, toValue },
+      })
       .then((res) => {
         console.log(res.data.meetings);
         setRecordingsArray(res.data.meetings);
@@ -147,7 +163,7 @@ export default function List() {
         console.log(recordingRows);
         console.log(recordingsArray);
         res.data.meetings.forEach((obj) => {
-          recordingsArray.push(
+          tempArray.push(
             createRecordingData(
               obj.id,
               obj.topic,
@@ -157,6 +173,7 @@ export default function List() {
             )
           );
         });
+        recordingRows = tempArray;
       })
       .catch((error) => {
         console.log(error);
@@ -201,6 +218,35 @@ export default function List() {
         <Box
           component="form"
           sx={{
+            "& .MuiTextField-root": { mb: 2, mt: 2, mr: 2.5, width: "30%" },
+          }}
+        >
+          <p> List Recordings</p>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DesktopDatePicker
+              label=""
+              inputFormat="MM/dd/yyyy"
+              value={fromValue}
+              onChange={handleFromChange}
+              renderInput={(params) => <TextField {...params} />}
+            />
+            <DesktopDatePicker
+              label=""
+              inputFormat="MM/dd/yyyy"
+              value={toValue}
+              onChange={handleToChange}
+              renderInput={(params) => <TextField {...params} />}
+            />
+          </LocalizationProvider>
+          <div className="recordingListDiv">
+            <Button variant="contained" onClick={handleRecordingList}>
+              List Recordings
+            </Button>
+          </div>
+        </Box>
+        <Box
+          component="form"
+          sx={{
             "& .MuiTextField-root": { mt: 3, mr: 2.5, width: "40%" },
           }}
         >
@@ -211,12 +257,9 @@ export default function List() {
             onChange={handleGetMeetingDetails}
             size="small"
           />
-          <Button variant="contained" onClick={handleGetMeetingBtn}>
-            Get
-          </Button>
-          <div className="recordingListDiv">
-            <Button variant="contained" onClick={handleRecordingList}>
-              List Recordings
+          <div className="meetingDetailsDiv">
+            <Button variant="contained" onClick={handleGetMeetingBtn}>
+              Get
             </Button>
           </div>
           <Modal
@@ -260,7 +303,10 @@ export default function List() {
                                 <TableCell
                                   key={column.id}
                                   align={column.align}
-                                  style={{ minWidth: column.minWidth }}
+                                  style={{
+                                    minWidth: column.minWidth,
+                                    padding: "0.5rem",
+                                  }}
                                 >
                                   {column.label}
                                 </TableCell>
@@ -283,7 +329,7 @@ export default function List() {
                                     tabIndex={-1}
                                     key={row.code}
                                   >
-                                    {columns.map((column) => {
+                                    {recordingColumns.map((column) => {
                                       const value = row[column.id];
                                       return (
                                         <TableCell
@@ -305,9 +351,9 @@ export default function List() {
                         </Table>
                       </TableContainer>
                       <TablePagination
-                        rowsPerPageOptions={[]}
+                        rowsPerPageOptions={[10, 25, 100]}
                         component="div"
-                        count={rows.length}
+                        count={recordingRows.length}
                         rowsPerPage={rowsPerPageRecording}
                         page={pageRecording}
                         onPageChange={handleChangePageRecording}
@@ -375,7 +421,7 @@ export default function List() {
                       <TableCell
                         key={column.id}
                         align={column.align}
-                        style={{ minWidth: column.minWidth }}
+                        style={{ minWidth: column.minWidth, padding: "0.5rem" }}
                       >
                         {column.label}
                       </TableCell>
