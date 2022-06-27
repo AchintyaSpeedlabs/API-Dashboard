@@ -1,8 +1,7 @@
 const express = require("express");
 const app = express();
-const cors = require("cors");
 const bodyParser = require("body-parser");
-const port = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001;
 var http = require("http").Server(app);
 const path = require("path");
 const fs = require("fs");
@@ -12,7 +11,9 @@ const { response } = require("express");
 
 require("dotenv").config({ path: __dirname + "/.env" });
 
-app.use(cors());
+const buildPath = path.join(__dirname, "../client", "build");
+app.use(express.static(buildPath));
+
 app.use(bodyParser.json());
 
 const payload = {
@@ -40,13 +41,15 @@ function compare(a, b) {
 }
 
 // Create an instant meeting
-app.get("/newmeeting", (req, res) => {
+app.post("/newmeeting", (req, res) => {
   email = process.env.USER_ID;
+  hostID = req.body.host_id;
+
   var options = {
     method: "POST",
-    uri: "https://api.zoom.us/v2/users/" + email + "/meetings",
+    uri: "https://api.zoom.us/v2/users/" + hostID + "/meetings",
     body: {
-      topic: "New Meeting",
+      topic: "Zoom Meeting",
       type: 1,
       settings: {
         host_video: "false",
@@ -80,17 +83,17 @@ app.post("/schedulemeeting", function (req, res) {
   scheduledMeetDetails = req.body;
   console.log(scheduledMeetDetails);
   email = process.env.USER_ID;
+  hostID = scheduledMeetDetails.host_id;
   const meetMinutes =
     parseInt(req.body.duration_hrs) * 60 + parseInt(req.body.duration_mins);
 
   var options = {
     method: "POST",
-    uri: "https://api.zoom.us/v2/users/" + email + "/meetings",
+    uri: "https://api.zoom.us/v2/users/" + hostID + "/meetings",
     body: {
       topic: scheduledMeetDetails.topic,
       type: 2,
       start_time: scheduledMeetDetails.when,
-      // schedule_for: process.env.USER_ID,
       duration: meetMinutes,
       settings: {
         host_video: scheduledMeetDetails.host == "off" ? false : true,
@@ -120,21 +123,31 @@ app.post("/schedulemeeting", function (req, res) {
     });
 });
 
+var meetingList = [];
+
 // List all the meetings for an account
-app.get("/listmeetings", function (req, res) {
-  console.log("You just sent a GET request to this route /listmeetings");
+app.post("/listmeetings", function (req, res) {
+  var meetingListFiltered = [];
+  console.log("You just sent a POST request to this route /listmeetings");
   email = process.env.USER_ID;
+  selectedHost = req.body.selected_host;
+  selectedHostId = userIdMapping[selectedHost];
+  console.log(selectedHostId);
+  console.log(selectedHost);
+  meetingType =
+    req.body.meeting_type === undefined ? "scheduled" : req.body.meeting_type;
 
   var options = {
     method: "GET",
     uri:
       "https://api.zoom.us/v2/users/" +
-      email +
+      selectedHost +
       "/meetings" +
       "?" +
-      "page_size=60" +
+      "page_size=300" +
       "&" +
-      "type=shceduled",
+      "type=" +
+      meetingType,
     auth: {
       bearer: token,
     },
@@ -151,8 +164,95 @@ app.get("/listmeetings", function (req, res) {
 
       var temp = response.meetings;
       temp.sort(compare);
-      console.log(temp);
-      res.json(temp);
+      // console.log(temp);
+      meetingList = temp;
+
+      for (var i = 0; i < temp.length; i++) {
+        if (meetingList[i].host_id === selectedHostId) {
+          console.log(meetingList[i].host_id === selectedHostId);
+          meetingListFiltered.push(meetingList[i]);
+        }
+      }
+      console.log(meetingListFiltered);
+      res.json(meetingListFiltered);
+    })
+    .catch(function (err) {
+      // API call failed...
+      console.log("API call failed, reason ", err);
+    });
+});
+
+var userDetails = [];
+var userIdMapping = {};
+var userEmails = [];
+
+// List all the users for an account
+app.post("/users", function (req, res) {
+  console.log("You just sent a POST request to this route /users");
+  email = process.env.USER_ID;
+
+  var options = {
+    method: "GET",
+    uri: "https://api.zoom.us/v2/users/",
+    auth: {
+      bearer: token,
+    },
+    headers: {
+      "User-Agent": "Zoom-api-Jwt-Request",
+      "content-type": "application/json",
+    },
+    json: true, //Parse the JSON string in the response
+  };
+
+  rp(options)
+    .then(function (response) {
+      // console.log("response is: ", response.users);
+      userDetails = response.users;
+
+      //iterate through the userDetails Array
+      for (var i = 0; i < userDetails.length; i++) {
+        userIdMapping[userDetails[i].email] = userDetails[i].id;
+      }
+      userEmails = Object.keys(userIdMapping);
+
+      for (var i = 0; i < userDetails.length; i++) {
+        userEmails[i] = userDetails[i].email;
+      }
+
+      for (var i = 0; i < userEmails.length; i++) {
+        console.log("user emails" + userEmails[i]);
+      }
+
+      res.json(userEmails);
+    })
+
+    .catch(function (err) {
+      // API call failed...
+      console.log("API call failed, reason ", err);
+    });
+});
+
+// Delete a Meeting
+app.post("/delete", function (req, res) {
+  console.log("You just sent a POST request to this route /delete");
+  email = process.env.USER_ID;
+
+  var options = {
+    method: "DELETE",
+    uri: "https://api.zoom.us/v2/meetings/" + "88688338575",
+    auth: {
+      bearer: token,
+    },
+    headers: {
+      "User-Agent": "Zoom-api-Jwt-Request",
+      "content-type": "application/json",
+    },
+    json: true, //Parse the JSON string in the response
+  };
+
+  rp(options)
+    .then(function (response) {
+      console.log("response is: ", response);
     })
     .catch(function (err) {
       // API call failed...
@@ -271,4 +371,4 @@ app.post("/listrecordings", function (req, res) {
     });
 });
 
-http.listen(port, () => console.log(`Listening on port ${port}`));
+http.listen(PORT, () => console.log(`Listening on port ${PORT}`));

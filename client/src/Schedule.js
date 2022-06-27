@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
@@ -35,7 +35,9 @@ const style = {
   p: 4,
 };
 
-export default function Schedule() {
+var tempHosts = [];
+
+export function Schedule() {
   const [when, setWhen] = React.useState(new Date("2022-08-18T21:11:54"));
   const [newMeetingDetails, setNewMeetingDetails] = useState(newMeetDetails);
   const [scheduledMeetingDetails, setScheduledMeetingDetails] = useState(
@@ -45,11 +47,30 @@ export default function Schedule() {
   const [hrs, setHrs] = useState("0");
   const [minutes, setMinutes] = useState("15");
   const [hostVid, setHostVid] = useState("off");
+  const [hostId, setHostId] = useState("vishal@speedlabs.in");
+  const [hostIdInstant, setHostIdInstant] = useState("vishal@speedlabs.in");
   const [participantVid, setParticipantVid] = useState("off");
   const [openCreate, setOpenCreate] = useState(false);
   const handleCloseCreate = () => setOpenCreate(false);
   const [openSchedule, setOpenSchedule] = useState(false);
   const handleCloseSchedule = () => setOpenSchedule(false);
+  const [hosts, setHosts] = useState([]);
+
+  useEffect(() => {
+    console.log("This particular useEffect is called");
+    axios
+      .post(`http://localhost:3001/users`)
+      .then((res) => {
+        // console.log(res.data);
+        for (var i = 0; i < res.data.length; i++) {
+          tempHosts.push({ value: res.data[i], label: res.data[i] });
+        }
+        setHosts(tempHosts);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   function submitSchedDetails() {
     initialFormValues.topic = topicName;
@@ -58,6 +79,7 @@ export default function Schedule() {
     initialFormValues.duration_mins = minutes;
     initialFormValues.host = hostVid;
     initialFormValues.participant = participantVid;
+    initialFormValues.host_id = hostId;
 
     axios
       .post("http://localhost:3001/schedulemeeting", initialFormValues)
@@ -68,9 +90,9 @@ export default function Schedule() {
           created_at: res.data.created_at,
           join_url: res.data.join_url,
           start_url: res.data.start_url,
-          password: res.data.password,
           duration: res.data.duration + "mins",
           start_time: res.data.start_time,
+          host_id: res.data.host_email,
         });
       })
       .catch((error) => {
@@ -86,6 +108,18 @@ export default function Schedule() {
 
   function handleHours(event) {
     setHrs(event.target.value);
+  }
+
+  function handleHostId(event) {
+    setHostId(event.target.value);
+  }
+
+  useEffect(() => {
+    console.log(hostIdInstant);
+  }, [hostIdInstant]);
+
+  function handleHostIdInstant(event) {
+    setHostIdInstant(event.target.value);
   }
 
   function handleMins(event) {
@@ -105,15 +139,17 @@ export default function Schedule() {
   }
 
   function createMeet() {
-    axios.get(`http://localhost:3001/newmeeting`).then((res) => {
-      setNewMeetingDetails({
-        topic: res.data.topic,
-        created_at: res.data.created_at,
-        join_url: res.data.join_url,
-        start_url: res.data.start_url,
-        password: res.data.password,
+    axios
+      .post(`http://localhost:3001/newmeeting`, { host_id: hostIdInstant })
+      .then((res) => {
+        setNewMeetingDetails({
+          topic: res.data.topic,
+          created_at: res.data.created_at,
+          join_url: res.data.join_url,
+          start_url: res.data.start_url,
+          password: res.data.password,
+        });
       });
-    });
     setOpenCreate(true);
   }
 
@@ -124,11 +160,24 @@ export default function Schedule() {
         <Box
           component="form"
           sx={{
-            "& .MuiTextField-root": { m: 1, width: "25ch" },
+            "& .MuiTextField-root": { width: "100%", mb: 1 },
           }}
-          noValidate
-          autoComplete="off"
         >
+          <TextField
+            select
+            label=""
+            value={hostIdInstant}
+            onChange={handleHostIdInstant}
+            helperText=""
+            size="small"
+          >
+            {hosts.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+
           <Button variant="contained" onClick={createMeet}>
             <AddCircleOutlinedIcon className="addIcon" />
             Create an Instant Meeting
@@ -187,6 +236,29 @@ export default function Schedule() {
             </Stack>
           </LocalizationProvider>
         </Box>
+        <p className="sched-title"> Select Host </p>
+        <Box
+          component="form"
+          sx={{
+            "& .MuiTextField-root": { width: "100%" },
+          }}
+          display="flex"
+          justifyContent="space-between"
+        >
+          <TextField
+            select
+            label=""
+            value={hostId}
+            onChange={handleHostId}
+            helperText=""
+          >
+            {hosts.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
         <p className="sched-title"> Duration </p>
         <Box
           component="form"
@@ -223,17 +295,21 @@ export default function Schedule() {
             ))}
           </TextField>
         </Box>
-
+        <p className="sched-title"> Video Setting </p>
         <Box
           component="form"
           sx={{
-            "& .MuiTextField-root": { width: "100%" },
+            "& .MuiTextField-root": {
+              width: "48%",
+              mt: 1,
+            },
           }}
+          display="flex"
+          justifyContent="space-between"
         >
-          <p className="sched-title"> Host </p>
           <TextField
             select
-            label=""
+            label="Host"
             value={hostVid}
             onChange={handleHostVid}
             helperText=""
@@ -244,10 +320,9 @@ export default function Schedule() {
               </MenuItem>
             ))}
           </TextField>
-          <p className="sched-title"> Participant </p>
           <TextField
             select
-            label=""
+            label="Participant"
             value={participantVid}
             onChange={handleParticipantVid}
             helperText=""
@@ -288,10 +363,10 @@ export default function Schedule() {
                       joinUrl={scheduledMeetingDetails.join_url}
                       startUrl={scheduledMeetingDetails.start_url}
                       topic={scheduledMeetingDetails.topic}
-                      password={scheduledMeetingDetails.password}
                       duration={scheduledMeetingDetails.duration}
                       meetingId={scheduledMeetingDetails.meeting_id}
                       startTime={scheduledMeetingDetails.start_time}
+                      hostId={scheduledMeetingDetails.host_id}
                     />
                   </div>
                 </Typography>
@@ -302,4 +377,8 @@ export default function Schedule() {
       </div>
     </div>
   );
+}
+
+export function hostsList() {
+  return tempHosts;
 }
