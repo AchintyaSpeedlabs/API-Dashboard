@@ -22,6 +22,7 @@ import {
   hostVideo,
   participantVideo,
 } from "./Data";
+import { baseURL } from "./config";
 
 const style = {
   position: "absolute",
@@ -59,7 +60,7 @@ export function Schedule() {
   useEffect(() => {
     console.log("This particular useEffect is called");
     axios
-      .post(`http://localhost:3001/users`)
+      .post(`https://zoom-meetings-dashboard.herokuapp.com/users`)
       .then((res) => {
         // console.log(res.data);
         for (var i = 0; i < res.data.length; i++) {
@@ -82,7 +83,10 @@ export function Schedule() {
     initialFormValues.host_id = hostId;
 
     axios
-      .post("http://localhost:3001/schedulemeeting", initialFormValues)
+      .post(
+        "https://zoom-meetings-dashboard.herokuapp.com/schedulemeeting",
+        initialFormValues
+      )
       .then((res) => {
         setScheduledMeetingDetails({
           meeting_id: res.data.id,
@@ -140,7 +144,9 @@ export function Schedule() {
 
   function createMeet() {
     axios
-      .post(`http://localhost:3001/newmeeting`, { host_id: hostIdInstant })
+      .post(`https://zoom-meetings-dashboard.herokuapp.com/newmeeting`, {
+        host_id: hostIdInstant,
+      })
       .then((res) => {
         setNewMeetingDetails({
           topic: res.data.topic,

@@ -81,7 +81,7 @@ export default function List() {
   useEffect(() => {
     var temp = [];
     axios
-      .post("http://localhost:3001/listmeetings", {
+      .post("https://zoom-meetings-dashboard.herokuapp.com/listmeetings", {
         meeting_type: meetingType,
         selected_host: selectedHost,
       })
@@ -113,7 +113,7 @@ export default function List() {
       console.log(selectedHost);
       var temp = [];
       axios
-        .post("http://localhost:3001/listmeetings", {
+        .post("https://zoom-meetings-dashboard.herokuapp.com/listmeetings", {
           meeting_type: meetingType,
           selected_host: selectedHost,
         })
@@ -212,7 +212,7 @@ export default function List() {
   function handleRecordingList() {
     var tempArray = [];
     axios
-      .post("http://localhost:3001/listrecordings", {
+      .post("https://zoom-meetings-dashboard.herokuapp.com/listrecordings", {
         range: { fromValue, toValue },
       })
       .then((res) => {
@@ -244,7 +244,7 @@ export default function List() {
 
   function handleGetMeetingBtn() {
     axios
-      .post("http://localhost:3001/getrecording", {
+      .post("https://zoom-meetings-dashboard.herokuapp.com/getrecording", {
         meetingID: meetingID.trim(),
       })
       .then((res) => {
