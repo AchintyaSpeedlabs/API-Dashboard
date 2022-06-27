@@ -1,8 +1,7 @@
 const express = require("express");
 const app = express();
-const cors = require("cors");
 const bodyParser = require("body-parser");
-const port = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001;
 var http = require("http").Server(app);
 const path = require("path");
 const fs = require("fs");
@@ -12,7 +11,9 @@ const { response } = require("express");
 
 require("dotenv").config({ path: __dirname + "/.env" });
 
-app.use(cors());
+const buildPath = path.join(__dirname, "../client", "build");
+app.use(express.static(buildPath));
+
 app.use(bodyParser.json());
 
 const payload = {
@@ -370,4 +371,4 @@ app.post("/listrecordings", function (req, res) {
     });
 });
 
-http.listen(port, () => console.log(`Listening on port ${port}`));
+http.listen(PORT, () => console.log(`Listening on port ${PORT}`));
