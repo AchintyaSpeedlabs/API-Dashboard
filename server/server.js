@@ -11,7 +11,7 @@ const { response } = require("express");
 
 require("dotenv").config({ path: __dirname + "/.env" });
 
-const buildPath = path.join(__dirname, "../client", "build");
+const buildPath = path.join(__dirname + "/public");
 app.use(express.static(buildPath));
 
 app.use(bodyParser.json());
