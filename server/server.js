@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const PORT = process.env.PORT || 3001;
 var http = require("http").Server(app);
@@ -164,7 +165,6 @@ app.post("/listmeetings", function (req, res) {
 
       var temp = response.meetings;
       temp.sort(compare);
-      // console.log(temp);
       meetingList = temp;
 
       for (var i = 0; i < temp.length; i++) {
