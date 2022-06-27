@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const PORT = process.env.PORT || 3001;
 var http = require("http").Server(app);
@@ -11,7 +12,7 @@ const { response } = require("express");
 
 require("dotenv").config({ path: __dirname + "/.env" });
 
-const buildPath = path.join(__dirname, "../client", "build");
+const buildPath = path.join(__dirname + "/public");
 app.use(express.static(buildPath));
 
 app.use(bodyParser.json());
@@ -164,7 +165,6 @@ app.post("/listmeetings", function (req, res) {
 
       var temp = response.meetings;
       temp.sort(compare);
-      // console.log(temp);
       meetingList = temp;
 
       for (var i = 0; i < temp.length; i++) {
