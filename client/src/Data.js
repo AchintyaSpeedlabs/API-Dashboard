@@ -13,11 +13,13 @@ export const columns = [
     id: "createdAt",
     label: "Created At",
     align: "left",
+    minWidth: 160,
   },
   {
     id: "startTime",
     label: "Start Time",
     align: "left",
+    minWidth: 160,
   },
   {
     id: "duration",
@@ -67,6 +69,7 @@ export const initialFormValues = {
   duration_mins: "15",
   host: "Off",
   participant: "Off",
+  host_id: "vishal@speeedlabs.in",
 };
 
 export const newMeetDetails = {
@@ -84,8 +87,8 @@ export const scheduledMeetDeets = {
   duration: "",
   join_url: "",
   start_url: "",
-  password: "",
   start_time: "",
+  host_id: "",
 };
 
 export const meetingDetails = {
@@ -119,6 +122,21 @@ export const hours = [
   {
     value: "4",
     label: "4",
+  },
+];
+
+export const meetingTypes = [
+  {
+    value: "scheduled",
+    label: "Scheduled",
+  },
+  {
+    value: "live",
+    label: "Live",
+  },
+  {
+    value: "previous_meetings",
+    label: "Previous",
   },
 ];
 

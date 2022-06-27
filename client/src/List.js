@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
@@ -17,7 +18,14 @@ import GetDetails from "./GetDetails";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
-import { columns, meetingDetails, recordingColumns } from "./Data";
+import {
+  columns,
+  meetingDetails,
+  recordingColumns,
+  meetingTypes,
+} from "./Data";
+
+import { hostsList } from "./Schedule";
 
 const style = {
   position: "absolute",
@@ -33,6 +41,7 @@ const style = {
 
 var rows = [];
 var recordingRows = [];
+var tempHosts = hostsList();
 
 export default function List() {
   const [getMeetDetails, SetGetMeetDetails] = useState(meetingDetails);
@@ -52,6 +61,9 @@ export default function List() {
   const handleCloseRecordingList = () => setOpenRecordingList(false);
   const [fromValue, setFromValue] = useState(new Date("2022-06-20T21:11:54"));
   const [toValue, setToValue] = useState(new Date("2022-06-21T21:11:54"));
+  const [meetingType, setMeetingType] = useState("scheduled");
+  const [hostId, setHostId] = useState("vishal@speedlabs.in");
+  const [selectedHost, setSelectedHost] = useState("vishal@speedlabs.in");
 
   const handleFromChange = (newValue) => {
     setFromValue(newValue);
@@ -61,14 +73,23 @@ export default function List() {
     setToValue(newValue);
   };
 
+  function handleHostId(event) {
+    setHostId(event.target.value);
+    setSelectedHost(event.target.value);
+  }
+
   useEffect(() => {
+    var temp = [];
     axios
-      .get("http://localhost:3001/listmeetings")
+      .post("http://localhost:3001/listmeetings", {
+        meeting_type: meetingType,
+        selected_host: selectedHost,
+      })
       .then((res) => {
         setList(res.data);
         rows = list;
         res.data.forEach((obj) => {
-          rows.push(
+          temp.push(
             createData(
               obj.id,
               obj.topic,
@@ -79,11 +100,49 @@ export default function List() {
             )
           );
         });
+        rows = temp;
       })
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [selectedHost]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      console.log(meetingType);
+      console.log(selectedHost);
+      var temp = [];
+      axios
+        .post("http://localhost:3001/listmeetings", {
+          meeting_type: meetingType,
+          selected_host: selectedHost,
+        })
+        .then((res) => {
+          setList(res.data);
+          rows = list;
+          res.data.forEach((obj) => {
+            temp.push(
+              createData(
+                obj.id,
+                obj.topic,
+                obj.created_at,
+                obj.start_time,
+                obj.duration,
+                obj.join_url
+              )
+            );
+          });
+          rows = temp;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }, 500);
+  }, [meetingType]);
+
+  const handleMeetingType = (event) => {
+    setMeetingType(event.target.value);
+  };
 
   const GmtToIst = (gmtTime) => {
     var s = new Date(gmtTime).toLocaleString(undefined, {
@@ -404,7 +463,49 @@ export default function List() {
       </div>
 
       <div className="list-meetings">
-        <p>Meeting List</p>
+        <div className="meetingListDiv">
+          <p>Meeting List</p>
+          <div className="innerMeetingListDiv">
+            <TextField
+              select
+              label=""
+              value={hostId}
+              onChange={handleHostId}
+              helperText=""
+              sx={{
+                minWidth: 150,
+                height: 60,
+                mr: 1,
+              }}
+              size="small"
+            >
+              {tempHosts.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              select
+              label=""
+              value={meetingType}
+              onChange={handleMeetingType}
+              helperText=""
+              sx={{
+                minWidth: 120,
+                height: 60,
+              }}
+              size="small"
+            >
+              {meetingTypes.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </div>
+        </div>
 
         <Box>
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
@@ -444,7 +545,6 @@ export default function List() {
                         >
                           {columns.map((column) => {
                             const value = row[column.id];
-                            console.log(value);
                             return (
                               <TableCell
                                 style={{ padding: "0.5rem" }}

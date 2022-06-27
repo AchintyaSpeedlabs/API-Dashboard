@@ -17,10 +17,10 @@ export default function SchedDetails({
   createdAt,
   joinUrl,
   startUrl,
-  password,
   duration,
   meetingId,
   startTime,
+  hostId,
 }) {
   return (
     <div style={{ width: "100%" }}>
@@ -37,19 +37,23 @@ export default function SchedDetails({
       >
         <p>
           {" "}
-          <strong> Topic: </strong> {topic}
+          <strong>Topic: </strong> {topic}
         </p>
         <p>
           {" "}
-          <strong> Scheduled For: </strong> {startTime}
-        </p>
-        <p>
-          {" "}
-          <strong> Meeting ID: </strong> {meetingId}
+          <strong>Meeting ID: </strong> {meetingId}
         </p>
         <p>
           {" "}
           <strong>Created at </strong> {createdAt}
+        </p>
+        <p>
+          {" "}
+          <strong>Start Time: </strong> {startTime}
+        </p>
+        <p>
+          {" "}
+          <strong>Host ID: </strong> {hostId}
         </p>
 
         <p>
@@ -69,10 +73,6 @@ export default function SchedDetails({
         <p>
           {" "}
           <strong> Duration: </strong> {duration}
-        </p>
-        <p>
-          {" "}
-          <strong>Password:</strong> {password}
         </p>
       </MyBox>
     </div>

@@ -128,6 +128,7 @@ Add some margins for each label .form-inline label {
   font-weight: 600;
   font-size: 1.4rem;
   color: #6a2f85;
+  margin-bottom: 1rem;
 }
 
 .create-meeting button {
@@ -184,7 +185,7 @@ Add some margins for each label .form-inline label {
 
 /* ------------ Schedule Meeting (Left Half) ------------*/
 .left {
-  flex: 10%;
+  flex: 5%;
   text-align: left;
   padding: 0.1rem 0.3rem 0.1rem 1.5rem;
 }
@@ -232,4 +233,16 @@ Add some margins for each label .form-inline label {
   width: 10%;
   margin-top: 1.4rem;
   background-color: #ff9433;
+}
+
+.meetingListDiv {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.innerMeetingListDiv {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
