@@ -246,3 +246,204 @@ Add some margins for each label .form-inline label {
   justify-content: space-between;
   align-items: baseline;
 }
+
+/* ------------- Styles for Mailchimp Application ----------------- */
+
+/* -------------------------- Snackbar ------------------------- */
+
+#members-snackbar {
+  visibility: hidden; /* Hidden by default. Visible on click */
+  min-width: 250px; /* Set a default minimum width */
+  margin-left: -125px; /* Divide value of min-width by 2 */
+  background-color: #333; /* Black background color */
+  color: #fff; /* White text color */
+  text-align: center; /* Centered text */
+  border-radius: 2px; /* Rounded borders */
+  padding: 16px; /* Padding */
+  position: fixed; /* Sit on top of the screen */
+  z-index: 1; /* Add a z-index if needed */
+  left: 50%; /* Center the snackbar */
+  bottom: 30px; /* 30px from the bottom */
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+#members-snackbar.show {
+  visibility: visible; /* Show the snackbar */
+  /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+    However, delay the fade out process for 2.5 seconds */
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
+}
+
+@keyframes fadein {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeout {
+  from {
+    bottom: 30px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    bottom: 30px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
+}
+
+/* ------------- Page Styling ------------------*/
+
+.card-header {
+  background-color: #6d3088;
+  color: white;
+}
+
+.headings {
+  color: #727679;
+}
+
+.subBtn,
+.sendBtn,
+.prevBtn,
+.schedBtn {
+  background-color: #6d3088;
+  color: white;
+}
+
+.startBtn {
+  background-color: #6d3088;
+  color: white;
+  padding: 0.4rem 1.8rem;
+}
+
+.schedHead {
+  font-size: 1.5rem;
+}
+
+.rss-lines {
+  font-size: 1.1rem;
+}
+
+iframe {
+  width: 70%;
+  height: 25em;
+  margin: 2rem;
+  border-radius: 0.3rem;
+  border-width: 0.05rem;
+  overflow: scroll;
+  display: none;
+  border-color: #6d3088;
+}
+
+input[type="datetime-local"] {
+  padding: 0.6rem 1.5rem;
+  margin: 0.4rem;
+  border-width: 0.01rem;
+  border-radius: 0.2rem;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  font-size: 1.2rem;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+  font-size: 1.2rem;
+}
+
+input[type="datetime-local"]::-webkit-datetime-edit-day-field:focus,
+input[type="datetime-local"]::-webkit-datetime-edit-month-field:focus,
+input[type="datetime-local"]::-webkit-datetime-edit-year-field:focus,
+input[type="datetime-local"]::-webkit-datetime-edit-hour-field:focus,
+input[type="datetime-local"]::-webkit-datetime-edit-minute-field:focus,
+input[type="datetime-local"]::-webkit-datetime-edit-local-field:focus {
+  background-color: #727679;
+  color: white;
+  outline: none;
+}
+
+.mailchimp-left p {
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: #6a2f85;
+  margin: 1rem 1rem 1rem 1.5rem;
+  text-align: left;
+}
+
+.mailchimp-left .updateMember {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #262626;
+  margin: 1rem 1rem 1rem 1.5rem;
+  text-align: left;
+}
+
+.MailBtns button {
+  height: 3rem;
+  background-color: #6a2f85;
+}
+
+.MailBtns .viewListBtn {
+  background-color: #ff9433;
+}
+
+.SendBtns {
+  margin: 1rem 1rem 1rem 0rem;
+}
+
+.SendBtns button {
+  height: 3rem;
+  background-color: #6a2f85;
+}
+
+.SendBtns .viewListBtn {
+  background-color: #ff9433;
+}
+
+.mailchimp-left button {
+  height: 3rem;
+}
+
+.mailchimp-left .sendText {
+  margin-left: 1.5rem;
+}
+
+.mailchimp-left .scheduleText {
+  margin-left: 1.5rem;
+}
+
+/* .mailBottomLeft {
+  flex: 40%;
+}
+
+.mailBottomRight {
+  flex: 40%;
+} */
