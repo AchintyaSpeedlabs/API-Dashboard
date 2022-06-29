@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Drawer from "@mui/material/Drawer";
 import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
@@ -32,16 +33,18 @@ const theme = createTheme({
 });
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+
   const menuItems = [
     {
       text: "Schedule Meetings",
       icon: <GroupsOutlinedIcon />,
-      path: "/",
+      path: "/meetings",
     },
     {
       text: "Send Mails",
       icon: <MailOutlinedIcon />,
-      path: "/",
+      path: "/mails",
     },
   ];
   return (
@@ -71,7 +74,7 @@ export default function Sidebar() {
                 <ListItem
                   button
                   key={item.text}
-                  onClick={() => console.log("This BUtton is Clicked")}
+                  onClick={() => navigate(item.path)}
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.text} />
