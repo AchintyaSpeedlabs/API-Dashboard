@@ -5,8 +5,8 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MailchimpApp from "./MailchimpApp";
-import SendAMail from "./routes/SendAMail";
-import ScheduleAMail from "./routes/ScheduleAMail";
+import SendMail from "./routes/SendMail";
+import ScheduleMail from "./routes/ScheduleMail";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -15,8 +15,8 @@ root.render(
       <Route path="/" element={<App />} />
       <Route path="/meetings" element={<App />} />
       <Route path="/mails" element={<MailchimpApp />}>
-        <Route path="send-a-mail" element={<SendAMail />} />
-        <Route path="schedule-a-mail" element={<ScheduleAMail />} />
+        <Route path="send-mail" element={<SendMail />} />
+        <Route path="schedule-mail" element={<ScheduleMail />} />
       </Route>
     </Routes>
   </BrowserRouter>
