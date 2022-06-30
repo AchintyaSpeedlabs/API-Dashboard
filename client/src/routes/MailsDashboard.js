@@ -6,6 +6,20 @@ import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 
 export default function MailsDashboard() {
+  const [sendBtnClassName, setSendClassName] = useState("sendText");
+  const [scheduleClassName, setScheduleClassName] = useState("scheduleText");
+
+  function handleSendClick() {
+    setSendClassName("sendText");
+    setScheduleClassName("scheduleText");
+  }
+
+  function handleScheduleClick() {
+    setSendClassName("sendTextAfterClick");
+    setScheduleClassName("scheduleTextAfterClick");
+  }
+
+  function handleExcelFile() {}
   return (
     <div>
       <div className="mailchimp-left">
@@ -16,10 +30,18 @@ export default function MailsDashboard() {
             "& .MuiTextField-root": { width: "100%", mb: 1 },
           }}
         >
-          <Link className="sendText" to="send-mail">
+          <Link
+            className={sendBtnClassName}
+            to="send-mail"
+            onClick={handleSendClick}
+          >
             Send mail
           </Link>
-          <Link className="scheduleText" to="schedule-mail">
+          <Link
+            className={scheduleClassName}
+            to="schedule-mail"
+            onClick={handleScheduleClick}
+          >
             Schedule mail
           </Link>
           <p className="updateMember">Update Member's List</p>
@@ -28,8 +50,8 @@ export default function MailsDashboard() {
             sx={{ minWidth: 1200, width: "100%", ml: 3, mt: 2, mb: 2, p: 0.5 }}
           >
             <CardActions>
-              <label for="excel_file">
-                <input type="file" id="excel_file" />
+              <label htmlFor="excel_file">
+                <input type="file" id="excel_file" onChange={handleExcelFile} />
               </label>
               <span id="fileName"></span>
             </CardActions>
@@ -50,10 +72,6 @@ export default function MailsDashboard() {
         <Box>
           <Outlet />
         </Box>
-
-        <div class="row justify-content-center">
-          <iframe id="code"></iframe>
-        </div>
 
         <div id="members-snackbar">Members Succesfully Added!</div>
       </div>

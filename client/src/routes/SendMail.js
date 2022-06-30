@@ -1,11 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 
-function handleSubjectLineChange() {}
-
 export default function SendMail() {
+  const [subLine, setSubLine] = useState("");
+  const [mailContent, setMailContent] = useState("");
+
+  const handleSubLine = (event) => {
+    setSubLine(event.target.value);
+  };
+
+  const handleMailContent = (event) => {
+    setMailContent(event.target.value);
+  };
+
   return (
     <div style={{ display: "flex", justifyContent: "space-around" }}>
       <div className="mailBottomLeft">
@@ -22,7 +31,7 @@ export default function SendMail() {
             label=""
             variant="outlined"
             placeholder="Enter the subject of the mail"
-            onChange={handleSubjectLineChange}
+            onChange={handleSubLine}
           />
         </Box>
         <p className="updateMember">Mail Content</p>
@@ -36,7 +45,7 @@ export default function SendMail() {
             label=""
             variant="outlined"
             placeholder="Enter Plaintext OR Raw HTML"
-            onChange={handleSubjectLineChange}
+            onChange={handleMailContent}
             multiline
             rows={10}
           />
@@ -64,20 +73,14 @@ export default function SendMail() {
         </Box>
       </div>
 
-      <div className="mailBottomRight">
+      <div className="SendMailBottomRight">
         <Box
           sx={{
             "& .MuiTextField-root": { ml: 3, width: 600 },
           }}
         >
           <p className="updateMember">Mail Preview</p>
-          <TextField
-            label=""
-            variant="outlined"
-            placeholder=""
-            multiline
-            rows={15}
-          />
+          <iframe srcDoc={mailContent}></iframe>
         </Box>
       </div>
     </div>
