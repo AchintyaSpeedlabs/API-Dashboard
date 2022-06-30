@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -13,6 +14,20 @@ export default function SendMail() {
 
   const handleMailContent = (event) => {
     setMailContent(event.target.value);
+  };
+
+  const handleSendClick = () => {
+    axios
+      .post("http://localhost:3001/send", {
+        subjectLine: subLine,
+        mailContent: mailContent,
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -63,6 +78,7 @@ export default function SendMail() {
               sx={{ ml: 3, mr: 1 }}
               variant="contained"
               className="subBtn"
+              onClick={handleSendClick}
             >
               Send
             </Button>
