@@ -1,4 +1,4 @@
-## Schedule Meetings Using Zoom API Integration
+## API Dashboard
 
 ### Getting Started
 
