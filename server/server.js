@@ -9,19 +9,24 @@ const fs = require("fs");
 const rp = require("request-promise");
 const jwt = require("jsonwebtoken");
 const { response } = require("express");
+const request = require("request");
+const fetch = require("node-fetch");
+const { PassThrough } = require("stream");
+const mailchimp = require("@mailchimp/mailchimp_marketing");
 
 require("dotenv").config({ path: __dirname + "/.env" });
 
-const buildPath = path.join(__dirname + "/public");
-app.use(express.static(buildPath));
+// const buildPath = path.join(__dirname + "/public");
+// app.use(express.static(buildPath));
 
+app.use(cors());
 app.use(bodyParser.json());
 
 const payload = {
-  iss: process.env.API_KEY,
+  iss: process.env.ZOOM_API_KEY,
   exp: new Date().getTime() + 5000,
 };
-const token = jwt.sign(payload, process.env.API_SECRET);
+const token = jwt.sign(payload, process.env.ZOOM_API_SECRET);
 
 // Function to convert the Date-Time Format into Only Date Format
 function DateFormat(str) {
@@ -43,7 +48,7 @@ function compare(a, b) {
 
 // Create an instant meeting
 app.post("/newmeeting", (req, res) => {
-  email = process.env.USER_ID;
+  email = process.env.ZOOM_USER_ID;
   hostID = req.body.host_id;
 
   var options = {
@@ -83,7 +88,7 @@ app.post("/schedulemeeting", function (req, res) {
   console.log("You just sent a POST request to the route /schedulemeeting");
   scheduledMeetDetails = req.body;
   console.log(scheduledMeetDetails);
-  email = process.env.USER_ID;
+  email = process.env.ZOOM_USER_ID;
   hostID = scheduledMeetDetails.host_id;
   const meetMinutes =
     parseInt(req.body.duration_hrs) * 60 + parseInt(req.body.duration_mins);
@@ -130,7 +135,7 @@ var meetingList = [];
 app.post("/listmeetings", function (req, res) {
   var meetingListFiltered = [];
   console.log("You just sent a POST request to this route /listmeetings");
-  email = process.env.USER_ID;
+  email = process.env.ZOOM_USER_ID;
   selectedHost = req.body.selected_host;
   selectedHostId = userIdMapping[selectedHost];
   console.log(selectedHostId);
@@ -189,7 +194,7 @@ var userEmails = [];
 // List all the users for an account
 app.post("/users", function (req, res) {
   console.log("You just sent a POST request to this route /users");
-  email = process.env.USER_ID;
+  email = process.env.ZOOM_USER_ID;
 
   var options = {
     method: "GET",
@@ -235,7 +240,7 @@ app.post("/users", function (req, res) {
 // Delete a Meeting
 app.post("/delete", function (req, res) {
   console.log("You just sent a POST request to this route /delete");
-  email = process.env.USER_ID;
+  email = process.env.ZOOM_USER_ID;
 
   var options = {
     method: "DELETE",
@@ -329,7 +334,7 @@ app.post("/getrecording", function (req, res) {
 // List all the Cloud recordings in the selected range (Only for Premium Accounts)
 app.post("/listrecordings", function (req, res) {
   console.log("You just sent a POST request to this route /listrecordings");
-  var userID = process.env.USER_ID;
+  var userID = process.env.ZOOM_USER_ID;
 
   from = DateFormat(req.body.range.fromValue);
   to = DateFormat(req.body.range.toValue);
@@ -369,6 +374,128 @@ app.post("/listrecordings", function (req, res) {
       console.log("API call failed, reason ", err);
       res.json(err);
     });
+});
+
+// ----------------- Server Code for MAILCHIMP PROJECT  -------------- //
+
+// Mailchimp Cofiguration
+mailchimp.setConfig({
+  apiKey: process.env.MAILCHIMP_API_KEY,
+  server: process.env.MAILCHIMP_SERVER_PREFIX,
+});
+
+// Check if able to make API calls to Mailchimp API
+async function run() {
+  const response = await mailchimp.ping.get();
+  console.log(response);
+}
+
+// -------- Submit User List to add new members to the Audience on Mailchimp --------- //
+
+//Submit Route
+app.post("/submit", (req, res) => {
+  console.log("You just made a POST request to the route /submit");
+  console.log(req.body);
+  var usersList = req.body.usersList;
+
+  for (var i = 0; usersList != undefined && i < usersList.length; i++) {
+    const email = usersList[i][2];
+    const firstName = usersList[i][0];
+    const lastName = usersList[i][1];
+
+    // Construct req Data
+    const data = {
+      members: [
+        {
+          email_address: email,
+          status: "subscribed",
+          merge_fields: {
+            FNAME: firstName,
+            LNAME: lastName,
+          },
+        },
+      ],
+    };
+
+    const postData = JSON.stringify(data);
+    fetch(
+      `https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/lists/${process.env.MAILCHIMP_AUDIENCE_ID}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `auth ${process.env.MAILCHIMP_API_KEY}`,
+        },
+        body: postData,
+      }
+    )
+      .then(
+        res.statusCode === 200 ? console.log("Success") : console.log("Fail")
+      )
+      .catch((err) => console.log(err));
+  }
+
+  res.status(200).send({ statusCode: res.statusCode });
+});
+
+// -------- Send an Email Using Campaigns on Mailchimp ----
+
+// List all Campaigns
+const listCampaigns = async () => {
+  const response = await mailchimp.campaigns.list();
+  console.log(response);
+};
+
+// Get Campaign Content
+const getContent = async () => {
+  const response = await mailchimp.campaigns.getContent(campaignID);
+  console.log(response);
+};
+
+var campaignID = "";
+
+// Create a new Campaign
+const createCampaign = async (sub) => {
+  const response = await mailchimp.campaigns.create({
+    type: "regular",
+    recipients: { list_id: process.env.MAILCHIMP_AUDIENCE_ID },
+    settings: {
+      subject_line: sub,
+      from_name: process.env.MAILCHIMP_FROM_NAME,
+      title: "Test API Campaign",
+      reply_to: process.env.MAILCHIMP_EMAIL,
+    },
+  });
+  console.log(response);
+  campaignID = response.id; // Campaign ID of the newly created campaign
+};
+
+// createCampaign();
+
+// Set content for an already created Campaign
+const setContent = async (htmlContent) => {
+  const response = await mailchimp.campaigns.setContent(String(campaignID), {
+    html: htmlContent,
+  });
+  console.log(response);
+};
+
+// Send the email campaign instantly
+const sendCampaign = async () => {
+  const response = await mailchimp.campaigns;
+  console.log("The Mail has been sent.");
+};
+
+// Send Route
+app.post("/send", (req, res) => {
+  console.log("You just made a POST request at the route /send");
+
+  const FinalSendCampaign = async () => {
+    const res = await createCampaign(req.body.subjectLine);
+    const result = await setContent(req.body.mailContent);
+    const result2 = await sendCampaign();
+  };
+
+  FinalSendCampaign();
 });
 
 http.listen(PORT, () => console.log(`Listening on port ${PORT}`));
