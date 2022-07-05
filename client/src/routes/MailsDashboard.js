@@ -30,8 +30,15 @@ const Alert = forwardRef(function Alert(props, ref) {
 var rows = [];
 
 export default function MailsDashboard() {
-  const [sendBtnClassName, setSendClassName] = useState("sendText");
-  const [scheduleClassName, setScheduleClassName] = useState("scheduleText");
+  var onSchedulePage = window.location.pathname === "/mails/schedule-mail";
+  var onSendPage = window.location.pathname === "/mails/send-mail";
+  console.log(onSendPage);
+  const [sendBtnClassName, setSendClassName] = useState(
+    onSchedulePage ? "sendTextAfterClick" : "sendText"
+  );
+  const [scheduleClassName, setScheduleClassName] = useState(
+    onSchedulePage ? "scheduleTextAfterClick" : "scheduleText"
+  );
   const [modalOpen, setModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -248,12 +255,6 @@ export default function MailsDashboard() {
                 </Paper>
               </Box>
             </Modal>
-            {/* <OutTable
-              data={this.state.rows}
-              columns={this.state.cols}
-              tableClassName="ExcelTable2007"
-              tableHeaderRowClass="heading"
-            /> */}
           </div>
           <Snackbar
             anchorOrigin={{

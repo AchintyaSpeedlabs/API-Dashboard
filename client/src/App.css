@@ -62,7 +62,7 @@ Add some margins for each label .form-inline label {
 }
 
 .App {
-  text-align: center;
+  /*text-align: center;*/
 }
 
 .App-logo {
@@ -354,7 +354,7 @@ Add some margins for each label .form-inline label {
 }
 
 .mailBottomRight iframe {
-  height: 37.5rem;
+  height: 31rem;
   width: 38rem;
   margin: 0rem 0rem 0rem 1.5rem;
   border-radius: 0.3rem;
