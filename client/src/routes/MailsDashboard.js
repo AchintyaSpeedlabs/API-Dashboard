@@ -255,12 +255,6 @@ export default function MailsDashboard() {
                 </Paper>
               </Box>
             </Modal>
-            {/* <OutTable
-              data={this.state.rows}
-              columns={this.state.cols}
-              tableClassName="ExcelTable2007"
-              tableHeaderRowClass="heading"
-            /> */}
           </div>
           <Snackbar
             anchorOrigin={{

@@ -46,7 +46,6 @@ export default function ScheduleMail() {
 
   const handleDateTimeChange = (newValue) => {
     setDateTimeValue(newValue);
-    console.log(dateTimeValue);
   };
 
   const handleRecurrenceChange = (event) => {
@@ -144,174 +143,7 @@ export default function ScheduleMail() {
             />
           </LocalizationProvider>
         </Box>
-        <p className="updateMember">Recurrence Pattern</p>
-        <Box
-          component="form"
-          sx={{
-            "& .MuiTextField-root": { ml: 3, width: "35%" },
-          }}
-          display="flex"
-          justifyContent="space-between"
-        >
-          <TextField
-            select
-            label=""
-            value={recurrence}
-            onChange={handleRecurrenceChange}
-            helperText=""
-          >
-            {recurrenceOptions.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-          <FormControl component="fieldset">
-            <FormGroup aria-label="position" row>
-              <FormControlLabel
-                value="monday"
-                control={
-                  <Checkbox
-                    sx={{
-                      color: purple[700],
-                      "&.Mui-checked": {
-                        color: purple[700],
-                      },
-                    }}
-                    icon={<CircleOutlinedIcon />}
-                    checkedIcon={<CheckCircleRoundedIcon />}
-                    size="small"
-                    style={{ padding: 0 }}
-                    onChange={handleMonday}
-                  />
-                }
-                label="M"
-                labelPlacement="top"
-              />
-              <FormControlLabel
-                value="tuesday"
-                control={
-                  <Checkbox
-                    sx={{
-                      color: purple[700],
-                      "&.Mui-checked": {
-                        color: purple[700],
-                      },
-                    }}
-                    icon={<CircleOutlinedIcon />}
-                    checkedIcon={<CheckCircleRoundedIcon />}
-                    size="small"
-                    style={{ padding: 0 }}
-                    onChange={handleTuesday}
-                  />
-                }
-                label="T"
-                labelPlacement="top"
-                size="small"
-              />
-              <FormControlLabel
-                value="wednesday"
-                control={
-                  <Checkbox
-                    sx={{
-                      color: purple[700],
-                      "&.Mui-checked": {
-                        color: purple[700],
-                      },
-                    }}
-                    icon={<CircleOutlinedIcon />}
-                    checkedIcon={<CheckCircleRoundedIcon />}
-                    size="small"
-                    style={{ padding: 0 }}
-                    onChange={handleWednesday}
-                  />
-                }
-                label="W"
-                labelPlacement="top"
-              />
-              <FormControlLabel
-                value="thursday"
-                control={
-                  <Checkbox
-                    sx={{
-                      color: purple[700],
-                      "&.Mui-checked": {
-                        color: purple[700],
-                      },
-                    }}
-                    icon={<CircleOutlinedIcon />}
-                    checkedIcon={<CheckCircleRoundedIcon />}
-                    size="small"
-                    style={{ padding: 0 }}
-                    onChange={handleThursday}
-                  />
-                }
-                label="T"
-                labelPlacement="top"
-              />
-              <FormControlLabel
-                value="friday"
-                control={
-                  <Checkbox
-                    sx={{
-                      color: purple[700],
-                      "&.Mui-checked": {
-                        color: purple[700],
-                      },
-                    }}
-                    icon={<CircleOutlinedIcon />}
-                    checkedIcon={<CheckCircleRoundedIcon />}
-                    size="small"
-                    style={{ padding: 0 }}
-                    onChange={handleFriday}
-                  />
-                }
-                label="F"
-                labelPlacement="top"
-              />
-              <FormControlLabel
-                value="saturday"
-                control={
-                  <Checkbox
-                    sx={{
-                      color: purple[700],
-                      "&.Mui-checked": {
-                        color: purple[700],
-                      },
-                    }}
-                    icon={<CircleOutlinedIcon />}
-                    checkedIcon={<CheckCircleRoundedIcon />}
-                    size="small"
-                    style={{ padding: 0 }}
-                    onChange={handleSaturday}
-                  />
-                }
-                label="S"
-                labelPlacement="top"
-              />
-              <FormControlLabel
-                value="sunday"
-                control={
-                  <Checkbox
-                    sx={{
-                      color: purple[700],
-                      "&.Mui-checked": {
-                        color: purple[700],
-                      },
-                    }}
-                    icon={<CircleOutlinedIcon />}
-                    checkedIcon={<CheckCircleRoundedIcon />}
-                    size="small"
-                    style={{ padding: 0 }}
-                    onChange={handleSunday}
-                  />
-                }
-                label="S"
-                labelPlacement="top"
-              />
-            </FormGroup>
-          </FormControl>
-        </Box>
+
         <p className="updateMember">Mail Content</p>
         <Box
           component="form"
@@ -344,9 +176,6 @@ export default function ScheduleMail() {
               onClick={handleScheduleClick}
             >
               Schedule
-            </Button>
-            <Button className="viewListBtn" variant="contained">
-              Preview
             </Button>
           </div>
         </Box>

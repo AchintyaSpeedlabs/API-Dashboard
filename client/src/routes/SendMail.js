@@ -82,9 +82,6 @@ export default function SendMail() {
             >
               Send
             </Button>
-            <Button className="viewListBtn" variant="contained">
-              Preview
-            </Button>
           </div>
         </Box>
       </div>
