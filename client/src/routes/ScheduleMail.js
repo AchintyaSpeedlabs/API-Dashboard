@@ -1,37 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
-import MenuItem from "@mui/material/MenuItem";
-import { recurrenceOptions } from "../MailData";
-import { purple } from "@mui/material/colors";
-import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 export default function ScheduleMail() {
   const [subLine, setSubLine] = useState("");
   const [dateTimeValue, setDateTimeValue] = useState(
-    new Date("2022-08-18T21:11:54")
+    new Date("2022-08-18T21:15:54")
   );
-  const [recurrence, setRecurrence] = useState("monthly");
   const [mailContent, setMailContent] = useState("");
-  const [monday, setMonday] = useState(false);
-  const [tuesday, setTuesday] = useState(false);
-  const [wednesday, setWednesday] = useState(false);
-  const [thursday, setThursday] = useState(false);
-  const [friday, setFriday] = useState(false);
-  const [saturday, setSaturday] = useState(false);
-  const [sunday, setSunday] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
   function convertUTCDateToLocalDate(date) {
     var newDate = new Date(
       date.getTime() - date.getTimezoneOffset() * 60 * 1000
@@ -44,40 +41,16 @@ export default function ScheduleMail() {
     console.log(subLine);
   };
 
+  useEffect(() => {
+    var minutes = dateTimeValue.getMinutes();
+    if (minutes == 0 || minutes == 15 || minutes == 30 || minutes == 45) {
+    } else {
+      setOpen(true);
+    }
+  }, [dateTimeValue]);
+
   const handleDateTimeChange = (newValue) => {
     setDateTimeValue(newValue);
-  };
-
-  const handleRecurrenceChange = (event) => {
-    setRecurrence(event.target.value);
-  };
-
-  const handleMonday = (event) => {
-    setMonday(event.target.checked);
-  };
-
-  const handleTuesday = (event) => {
-    setTuesday(event.target.checked);
-  };
-
-  const handleWednesday = (event) => {
-    setWednesday(event.target.checked);
-  };
-
-  const handleThursday = (event) => {
-    setThursday(event.target.checked);
-  };
-
-  const handleFriday = (event) => {
-    setFriday(event.target.checked);
-  };
-
-  const handleSaturday = (event) => {
-    setSaturday(event.target.checked);
-  };
-
-  const handleSunday = (event) => {
-    setSunday(event.target.checked);
   };
 
   const handleMailContent = (event) => {
@@ -143,6 +116,24 @@ export default function ScheduleMail() {
             />
           </LocalizationProvider>
         </Box>
+
+        <Snackbar
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={open}
+          autoHideDuration={6000}
+          onClose={handleClose}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="warning"
+            sx={{ width: "100%" }}
+          >
+            Schedule time may only be in 15 minute intervals, e.g. 9:15 not 9:10
+          </Alert>
+        </Snackbar>
 
         <p className="updateMember">Mail Content</p>
         <Box
