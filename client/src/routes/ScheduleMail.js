@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -18,8 +19,9 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
 export default function ScheduleMail() {
   const [subLine, setSubLine] = useState("");
-  const [dateValue, setDateValue] = useState(new Date("2022-08-18"));
-  const [timeValue, setTimeValue] = useState(new Date("2014-08-18T21:11:54"));
+  const [dateTimeValue, setDateTimeValue] = useState(
+    new Date("2022-08-18T21:11:54")
+  );
   const [recurrence, setRecurrence] = useState("monthly");
   const [mailContent, setMailContent] = useState("");
   const [monday, setMonday] = useState(false);
@@ -30,16 +32,21 @@ export default function ScheduleMail() {
   const [saturday, setSaturday] = useState(false);
   const [sunday, setSunday] = useState(false);
 
+  function convertUTCDateToLocalDate(date) {
+    var newDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60 * 1000
+    );
+    return newDate;
+  }
+
   const handleSubLine = (event) => {
     setSubLine(event.target.value);
+    console.log(subLine);
   };
 
-  const handleDateChange = (newValue) => {
-    setDateValue(newValue);
-  };
-
-  const handleTimeChange = (newValue) => {
-    setTimeValue(newValue);
+  const handleDateTimeChange = (newValue) => {
+    setDateTimeValue(newValue);
+    console.log(dateTimeValue);
   };
 
   const handleRecurrenceChange = (event) => {
@@ -76,6 +83,22 @@ export default function ScheduleMail() {
 
   const handleMailContent = (event) => {
     setMailContent(event.target.value);
+    console.log(mailContent);
+  };
+
+  const handleScheduleClick = () => {
+    axios
+      .post("http://localhost:3001/schedule", {
+        subjectLine: subLine,
+        mailContent: mailContent,
+        scheduleDateTime: dateTimeValue,
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -108,15 +131,15 @@ export default function ScheduleMail() {
             <DesktopDatePicker
               label=""
               inputFormat="MM/dd/yyyy"
-              value={dateValue}
-              onChange={handleDateChange}
+              value={dateTimeValue}
+              onChange={handleDateTimeChange}
               renderInput={(params) => <TextField {...params} />}
             />
 
             <TimePicker
               label=""
-              value={timeValue}
-              onChange={handleTimeChange}
+              value={dateTimeValue}
+              onChange={handleDateTimeChange}
               renderInput={(params) => <TextField {...params} />}
             />
           </LocalizationProvider>
@@ -318,8 +341,9 @@ export default function ScheduleMail() {
               sx={{ ml: 3, mr: 1 }}
               variant="contained"
               className="subBtn"
+              onClick={handleScheduleClick}
             >
-              Send
+              Schedule
             </Button>
             <Button className="viewListBtn" variant="contained">
               Preview
