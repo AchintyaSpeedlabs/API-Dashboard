@@ -498,4 +498,29 @@ app.post("/send", (req, res) => {
   FinalSendCampaign();
 });
 
+// Schedule an email campaign (will be sent only once)
+const scheduleCampaign = async (campaign_id, date_time) => {
+  const response = await mailchimp.campaigns.schedule(campaign_id, {
+    schedule_time: date_time, //"2022-05-27T12:12:14.300Z"
+  });
+  console.log(response);
+};
+
+// Schedule Route
+app.post("/schedule", (req, res) => {
+  console.log("You just made a POST request to the route /schedule");
+  console.log(req.body);
+
+  const FinalScheduleCampaign = async () => {
+    const res = await createCampaign(req.body.subjectLine);
+    const result = await setContent(req.body.mailContent);
+    const result2 = await scheduleCampaign(
+      campaignID,
+      req.body.scheduleDateTime
+    );
+  };
+
+  FinalScheduleCampaign();
+});
+
 http.listen(PORT, () => console.log(`Listening on port ${PORT}`));
